@@ -1,32 +1,114 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-app-bar
+      app
+      color="primary"
+      dark
+    >
+      <div class="d-flex align-center">
+        <v-img
+          id="isedol-logo"
+          contain
+          src="@/assets/isedol_logo.png"
+          transition="scale-transition"
+          width="50"
+        />
+        <span id="title">이세돌 핫클립</span>
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-btn
+        color="purple"
+        elevation="2"
+      >로그인</v-btn>
+
+    </v-app-bar>
+    <v-main>
+      <router-view/>
+    </v-main>
+    <v-app-bar
+      color="grey darken-2"
+      elevation="4"
+    >
+    <div class="d-flex align-center footer" id="footer">
+      <v-icon
+        color="white"
+      >
+        mdi-email
+      </v-icon>
+      ambition65@naver.com
+    </div>
+
+    <v-spacer></v-spacer>
+
+    <!-- <a href="https://github.com/ambition98/isedol-clip-frontend"> -->
+    <span class="github" @click="goToGithubFront">
+      <v-img
+          class="github-logo"
+          contain
+          src="@/assets/github_logo.png"
+          transition="scale-transition"
+          max-width="30"
+      /> <span class="github-span">Frontend</span>
+    </span>
+    <!-- </a> -->
+    <!-- <a href="https://github.com/ambition98/isedol-clip-backend"> -->
+    <span class="github" @click="goToGithubBack">
+      <v-img
+          class="github-logo"
+          contain
+          src="@/assets/github_logo.png"
+          transition="scale-transition"
+          max-width="30"
+      /> <span class="github-span">Backend</span>
+    </span>
+    <!-- </a> -->
+    </v-app-bar>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+export default {
+  name: 'App',
+  component: {
+  },
+  data: () => ({
+    //
+  }),
+  methods: {
+    goToGithubFront() {
+      window.open('https://github.com/ambition98/isedol-clip-frontend')
+    },
+    goToGithubBack() {
+      window.open('https://github.com/ambition98/isedol-clip-backend')
+    }
+  }
 }
-
-nav {
-  padding: 30px;
+</script>
+<style scoped>
+#isedol-logo {
+  margin-right: 10px;
 }
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+#title {
+  font-size: 1.5rem;
 }
-
-nav a.router-link-exact-active {
-  color: #42b983;
+#footer {
+  font-size: 1.2rem;
+  color: white;
+}
+#footer > i {
+  margin-right: 10px;
+}
+.github {
+  margin-left: 20px;
+  cursor: pointer;
+}
+.github-logo {
+  margin-left: 20px;
+}
+.github-span {
+  font-size: 1.1rem;
+  color: white;
 }
 </style>
