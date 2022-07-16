@@ -18,16 +18,20 @@
                 {{ getCnt(this.period) }}
                 {{ getLen() }}
                 {{ this.period }}
-                <v-row v-if="getCnt(this.period) != getLen" justify="center">
+                <v-row v-if="getCnt() != getLen()" justify="center">
                     <v-col v-for="n in 12" :key="n" align-self="start" md="3">
                         <SkeletonLoader />
                     </v-col>
                 </v-row>
                 <v-row v-else>
-                    <v-col v-for="clip in getHotclips(this.period)" :key="clip.id" align-self="start" md="3">
+                    <v-col v-for="clip in getHotclips()" :key="clip.id" align-self="start" md="3">
                         <v-img
                             :src="clip.thumbnailUrl"
                         ></v-img>
+                        {{ clip.viewCount }}
+                        {{ clip.title }}
+                        {{ clip.createdAt }}
+                        {{ clip.duration }}
                     </v-col>
                 </v-row>
             </v-container>
@@ -107,11 +111,11 @@ export default {
         getLen() {
             return this.$store.getters.getIsedolLogins.length
         },
-        getCnt(period) {
-            return this.$store.getters.getHotClipCnt(period)
+        getCnt() {
+            return this.$store.getters.getHotClipCnt(this.period)
         },
-        getHotclips(period) {
-            return this.$store.getters.getHotClips(period)
+        getHotclips() {
+            return this.$store.getters.getHotClips(this.period)
         },
         requestClips(period) {
             const loadedCnt = this.getCnt(period)
@@ -142,13 +146,12 @@ export default {
                         params: {
                             login: e,
                             first: this.first,
-                            startedAt: this.startedAt,
-                            endedAt: this.endedAt
+                            startedAt: startedAt,
+                            endedAt: endedAt
                         }
                     }).then(res => {
                         res.data.dto.clips.forEach(e => {
-                            // console.log(e)
-                            this.pushClip(e)
+                            this.pushClip(e, period)
                         })
                         this.increseCnt(period)
                     }).catch(error => {
