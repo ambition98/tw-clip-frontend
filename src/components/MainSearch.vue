@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container class="search-container">
         <v-row justify="center" align="center">
             <v-col sm="5">
             <!-- <v-row align="center"> -->
@@ -32,3 +32,8 @@ export default {
     methods: {}
 }
 </script>
+<style scoped>
+.search-container {
+    margin-top: 70px;
+}
+</style>

@@ -3,10 +3,13 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
-import axios from 'axios'
 
 Vue.config.productionTip = false
+
+const axios = require('axios')
 Vue.prototype.$axios = axios
+// axios.defaults.baseURL = 'http://danyleee.com'
+axios.defaults.baseURL = 'http://localhost'
 
 new Vue({
   router,

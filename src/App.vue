@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      color="primary"
+      color="deep-purple darken-1"
       dark
     >
       <div class="d-flex align-center">
@@ -18,7 +18,7 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
+      <v-btn id="test"
         color="purple"
         elevation="2"
       >로그인</v-btn>
@@ -110,5 +110,13 @@ export default {
 .github-span {
   font-size: 1.1rem;
   color: white;
+}
+.test {
+  box-shadow: 5px 5px 5px 5px white;
+}
+</style>
+<style>
+a {
+  text-decoration: none;
 }
 </style>

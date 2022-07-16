@@ -1,10 +1,16 @@
 <template>
-    <div></div>
+    <div>
+        핫클립 페이지
+        <HotClips />
+    </div>
 </template>
 <script>
+import HotClips from '@/components/HotClips.vue'
+
 export default {
-    name: 'HotClips',
-    components: {},
+    components: {
+        HotClips
+    },
     data() {
         return {
             sampleData: ''
