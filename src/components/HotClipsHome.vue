@@ -15,10 +15,10 @@
                         </div>
                     </router-link>
                 </v-row> -->
-                {{ getCnt(this.period) }}
-                {{ getLen() }}
-                {{ this.period }}
-                <v-row v-if="getCnt() != getLen()" justify="center">
+                cnt: {{ getCnt() }},
+                len: {{ getLen() }}
+                period: {{ this.period }}
+                <v-row v-if="isLoaded" justify="center">
                     <v-col v-for="n in 12" :key="n" align-self="start" md="3">
                         <SkeletonLoader />
                     </v-col>
@@ -65,106 +65,88 @@ export default {
     },
     data() {
         return {
-            // sortedWeek: false,
-            // sortedMonth: false,
-            // sorted: false
-            // period: ['week', 'month', 'quarter']
+            first: 2,
+            periodArr: ['week', 'month', 'quarter']
         }
     },
-    props: ['first', 'period'],
+    props: ['period'],
     setup() {},
     created() {
-        this.requestClips('week')
-        this.requestClips('month')
-        this.requestClips('quarter')
+        this.requestClips()
     },
     computed: {
-        // getLen() {
-        //     return this.$store.getters.getIsedolLogins().length
-        // },
-        // getCnt(period) {
-        //     return this.$store.getters.getHotClipCnt(period)
-        // },
-        // getHotclips(period) {
-        //     return this.$store.getters.getHotClips(period)
-        // }
-        // getWeekCnt() {
-        //     return this.$store.getters.getWeekHotclipLoadedCnt
-        // },
-        // getWeekClips() {
-        //     return this.$store.getters.getWeekHotclips
-        // },
-        // getMonthCnt() {
-        //     return this.$store.getters.getMonthHotclipLoadedCnt
-        // },
-        // getMonthClips() {
-        //     return this.$store.getters.getMonthHotclips
-        // },
-        // getQuarterCnt() {
-        //     return this.$store.getters.getQuarterHotclipLoadedCnt
-        // },
-        // getQuarterClips() {
-        //     return this.$store.getters.getQuarterHotclips
-        // }
+        isLoaded() {
+            // return this.$store.getters.getHotclipLoadedCnt
+            return this.getCnt() === this.getLen() * this.first * this.periodArr.length
+        }
     },
     methods: {
-        getLen() {
-            return this.$store.getters.getIsedolLogins.length
-        },
-        getCnt() {
-            return this.$store.getters.getHotClipCnt(this.period)
-        },
-        getHotclips() {
-            return this.$store.getters.getHotClips(this.period)
-        },
-        requestClips(period) {
-            const loadedCnt = this.getCnt(period)
-            console.log(period + ' cnt: ' + loadedCnt)
-            if (loadedCnt === 6) {
-                return
-            }
+        requestClips() {
+            // const loadedCnt = this.getCnt()
+            const endedAt = this.getYmd(new Date())
+            let reqCnt = 0
+            let resvCnt = 0
+            // console.log('cnt: ' + loadedCnt)
+            this.periodArr.forEach(p => {
+                const startedAt = this.getStartedYmd(p)
+                console.log('startedAt: ' + startedAt + ', endedAt: ' + endedAt)
 
-            const startedDate = new Date()
-            const endedDate = new Date()
-            const nowYear = endedDate.getFullYear()
-            const nowMonth = endedDate.getMonth() + 1
-            const nowDate = endedDate.getDate()
-            const endedAt = nowYear + '-' + nowMonth + '-' + nowDate
-
-            if (period === 'week') {
-                startedDate.setDate(nowDate - 7)
-            } else if (period === 'month') {
-                startedDate.setMonth(nowMonth - 2)
-            } else {
-                startedDate.setMonth(nowMonth - 4)
-            }
-            const startedAt = startedDate.getFullYear() + '-' + (startedDate.getMonth() + 1) + '-' + startedDate.getDate()
-            console.log('startedAt: ' + startedAt + ', endedAt: ' + endedAt)
-            if (loadedCnt !== 6) {
-                this.$store.getters.getIsedolLogins.forEach(e => {
+                this.$store.getters.getIsedolLogins.forEach(login => {
+                    console.log('reqCnt: ' + ++reqCnt)
                     this.$axios.get('/api/twitch/clips', {
                         params: {
-                            login: e,
+                            login: login,
                             first: this.first,
                             startedAt: startedAt,
                             endedAt: endedAt
                         }
                     }).then(res => {
-                        res.data.dto.clips.forEach(e => {
-                            this.pushClip(e, period)
+                        console.log('recvCnt: ' + ++resvCnt)
+                        res.data.dto.clips.forEach(clip => {
+                            this.pushClip(clip, p)
                         })
-                        this.increseCnt(period)
+                        this.increseCnt()
                     }).catch(error => {
                         console.log('err: ' + error)
                     })
                 })
+            })
+        },
+        getStartedYmd(period) {
+            const now = new Date()
+            const startedDate = new Date()
+
+            if (period === 'week') {
+                startedDate.setDate(now.getDate() - 7)
+            } else if (period === 'month') {
+                startedDate.setMonth((now.getMonth() + 1) - 2)
+            } else {
+                startedDate.setMonth((now.getMonth() + 1) - 4)
             }
+
+            return this.getYmd(startedDate)
+        },
+        getYmd(date) {
+            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+        },
+        getLen() {
+            return this.$store.getters.getIsedolLogins.length
+        },
+        getCnt() {
+            return this.$store.getters.getHotclipLoadedCnt
+        },
+        getHotclips() {
+            return this.$store.getters.getHotclips(this.period)
         },
         pushClip(clip, period) {
-            this.$store.dispatch('pushClip', clip, period)
+            const payload = {
+                period: period,
+                clip: clip
+            }
+            this.$store.dispatch('pushClip', payload)
         },
-        increseCnt(period) {
-            this.$store.dispatch('increseHotClipLoadedCnt', period)
+        increseCnt() {
+            this.$store.dispatch('increseHotClipLoadedCnt')
         }
     }
 }

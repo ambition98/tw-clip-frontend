@@ -8,8 +8,8 @@ Vue.config.productionTip = false
 
 const axios = require('axios')
 Vue.prototype.$axios = axios
-// axios.defaults.baseURL = 'http://danyleee.com'
-axios.defaults.baseURL = 'http://localhost'
+axios.defaults.baseURL = 'http://danyleee.com'
+// axios.defaults.baseURL = 'http://localhost'
 
 new Vue({
   router,
