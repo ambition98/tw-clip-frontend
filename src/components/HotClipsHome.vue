@@ -2,58 +2,27 @@
     <div>
         <v-item-group class="hotclip-container">
             <v-container>
-                <!-- <v-row class="hotclip-top">
-                    <router-link to="/hotclips" class="router-link">
-                        <div>
-                            <span class="hotclip-title">주간 핫클립</span>
-                            <span class="hotclip-more">
-                                더보기
-                            </span>
-                            <v-icon style="position: relative; bottom: 4px; right: 9px">
-                                mdi-chevron-right
-                            </v-icon>
-                        </div>
-                    </router-link>
-                </v-row> -->
                 cnt: {{ getCnt() }},
                 len: {{ getLen() }}
                 period: {{ this.period }}
-                <v-row v-if="isLoaded" justify="center">
+                <v-row v-if="!isLoaded" justify="center">
                     <v-col v-for="n in 12" :key="n" align-self="start" md="3">
                         <SkeletonLoader />
                     </v-col>
                 </v-row>
                 <v-row v-else>
-                    <v-col v-for="clip in getHotclips()" :key="clip.id" align-self="start" md="3">
+                    <v-col v-for="clip in getHotclips()" :key="clip.id" align-self="start" md="3" class="clip-container">
+                        <span class="duration clip-info">{{ getDuration(clip) }}</span>
                         <v-img
                             :src="clip.thumbnailUrl"
                         ></v-img>
-                        {{ clip.viewCount }}
+                        <span class="view-count clip-info">{{ getViewCount(clip) }}</span>
+                        <span class="created-at clip-info">{{ getCreatedAt(clip) }}</span>
                         {{ clip.title }}
-                        {{ clip.createdAt }}
-                        {{ clip.duration }}
                     </v-col>
                 </v-row>
             </v-container>
         </v-item-group>
-        <!-- <v-item-group class="hotclip-container">
-            <v-container>
-                <v-row>
-                    월간 핫클립 . 더보기
-                </v-row>
-                <v-row v-if="this.$hotClipsLoadedCount != this.$broadcasterLogin.length" justify="center">
-                    <ProgressCircular />
-                </v-row>
-                <v-row v-else>
-                    <v-col v-for="n in 16" :key="n" align-self="start" md="3">
-                        <v-img
-                            src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                        ></v-img>
-                        조회수:
-                    </v-col>
-                </v-row>
-            </v-container>
-        </v-item-group> -->
     </div>
 </template>
 <script>
@@ -65,7 +34,7 @@ export default {
     },
     data() {
         return {
-            first: 2,
+            first: 4,
             periodArr: ['week', 'month', 'quarter']
         }
     },
@@ -76,32 +45,30 @@ export default {
     },
     computed: {
         isLoaded() {
-            // return this.$store.getters.getHotclipLoadedCnt
-            return this.getCnt() === this.getLen() * this.first * this.periodArr.length
+            const loaded = this.getCnt() === this.getLen() * this.periodArr.length
+            if (loaded) {
+                this.$store.dispatch('sortHotclip')
+                return true
+            } else {
+                return false
+            }
         }
     },
     methods: {
         requestClips() {
-            // const loadedCnt = this.getCnt()
             const endedAt = this.getYmd(new Date())
-            let reqCnt = 0
-            let resvCnt = 0
-            // console.log('cnt: ' + loadedCnt)
             this.periodArr.forEach(p => {
                 const startedAt = this.getStartedYmd(p)
-                console.log('startedAt: ' + startedAt + ', endedAt: ' + endedAt)
 
-                this.$store.getters.getIsedolLogins.forEach(login => {
-                    console.log('reqCnt: ' + ++reqCnt)
+                this.$store.getters.getIsedolId.forEach(id => {
                     this.$axios.get('/api/twitch/clips', {
                         params: {
-                            login: login,
+                            broadcasterId: id,
                             first: this.first,
                             startedAt: startedAt,
                             endedAt: endedAt
                         }
                     }).then(res => {
-                        console.log('recvCnt: ' + ++resvCnt)
                         res.data.dto.clips.forEach(clip => {
                             this.pushClip(clip, p)
                         })
@@ -128,6 +95,37 @@ export default {
         },
         getYmd(date) {
             return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+        },
+        getDuration(clip) {
+            const duration = Math.round(clip.duration)
+            if (duration < 60) {
+                return '0:' + duration
+            } else {
+                return '1:00'
+            }
+        },
+        getViewCount(clip) {
+            const viewCount = clip.viewCount
+            const str = viewCount.toString()
+            let unit = ''
+            let i = ''
+            if (viewCount < 10000) {
+                return viewCount.toLocaleString('ko-KR') + '회 시청'
+            } else if (viewCount < 100000000) {
+                i = str.length - 4
+                unit = '만 회 시청'
+            } else {
+                i = str.length - 8
+                unit = '억 회 시청'
+            }
+
+            const front = str.substring(0, i).toLocaleString('ko-KR')
+            const end = str.substring(i, i + 1)
+
+            return front + '.' + end + unit
+        },
+        getCreatedAt(clip) {
+            
         },
         getLen() {
             return this.$store.getters.getIsedolLogins.length
@@ -169,5 +167,28 @@ export default {
 }
 .router-link {
     color: black;
+}
+.clip-container {
+    position: relative;
+}
+.clip-info {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    z-index: 1;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+.duration {
+    top: 7%;
+    left: 5%;
+}
+.view-count {
+    bottom: 15%;
+    left: 5%;
+}
+.created-at {
+    bottom: 15%;
+    right: 5%;
 }
 </style>
