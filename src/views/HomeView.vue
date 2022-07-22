@@ -1,36 +1,39 @@
 <template>
   <div>
     <MainSearch />
-    <v-tabs v-model="tab" grow>
+    <v-tabs
+      v-model="tab"
+      color="purple"
+      grow
+    >
+      <!-- background-color="purple lighten-5" -->
       <v-tab v-for="item in items" :key="item.period">
         {{ item.title }}
       </v-tab>
-      <!-- <v-tab @click="setPeriod('week')">주간 핫클립</v-tab>
-      <v-tab @click="setPeriod('month')">월간 핫클립</v-tab>
-      <v-tab @click="setPeriod('quarter')">분기별 핫클립</v-tab> -->
     </v-tabs>
     <div v-if="tab === 0">
-      <HotClipsHome :first="2" :period="items[tab].period"/>
+      <HotClipsHome :period="items[tab].period" @openModal="openModal" />
     </div>
     <div v-else-if="tab === 1">
-      <HotClipsHome :first="2" :period="items[tab].period"/>
+      <HotClipsHome :period="items[tab].period" @openModal="openModal" />
     </div>
     <div v-else>
-      <HotClipsHome :first="2" :period="items[tab].period"/>
+      <HotClipsHome :period="items[tab].period" @openModal="openModal" />
     </div>
-    <!-- <HotClips :first="2" :period="item"/> -->
+    <!-- <ClipModal @close="closeModal" v-if="modal" @closeModal="closeModal" /> -->
   </div>
 </template>
-s
 <script>
 import MainSearch from '@/components/MainSearch.vue'
 import HotClipsHome from '@/components/HotClipsHome.vue'
+// import ClipModal from '@/components/ClipModal.vue'
 
 export default {
   name: 'Home',
   components: {
     MainSearch,
     HotClipsHome
+    // ClipModal
   },
   data() {
     return {
@@ -39,13 +42,19 @@ export default {
         { period: 'month', title: '월간 핫클립' },
         { period: 'quarter', title: '분기별 핫클립' }
       ],
-      tab: 0
+      tab: 0,
+      modal: false
     }
   },
   methods: {
-    // setPeriod(period) {
-    //   this.peirod = period
-    // }
+    openModal() {
+      console.log('open')
+      this.modal = true
+    },
+    closeModal() {
+      console.log('close')
+      this.modal = false
+    }
   }
 }
 </script>
