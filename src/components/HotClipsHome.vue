@@ -119,8 +119,6 @@ export default {
                             this.pushClip(clip, p)
                         })
                         this.increseCnt()
-                    }).catch(error => {
-                        console.log('err: ' + error)
                     })
                 })
             })
@@ -193,7 +191,7 @@ export default {
         },
         openModal(url) {
             console.log(url)
-            this.embedUrl = url + '&parent=isedol-clip.xyz'
+            this.embedUrl = url + '&parent=localhost'
             this.modal = true
         },
         copied() {

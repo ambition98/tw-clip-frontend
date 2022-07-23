@@ -10,7 +10,9 @@ export default new Vuex.Store({
     weekHotclips: [],
     monthHotclips: [],
     quarterHotclips: [],
-    hotclipLoadedCnt: 0
+    hotclipLoadedCnt: 0,
+    user: '',
+    login: false
   },
   getters: {
     getIsedolLogins(state) {
@@ -30,6 +32,12 @@ export default new Vuex.Store({
     },
     getHotclipLoadedCnt(state) {
       return state.hotclipLoadedCnt
+    },
+    getUser(state) {
+      return state.user
+    },
+    getLogin(state) {
+      return state.login
     }
   },
   mutations: {
@@ -55,6 +63,10 @@ export default new Vuex.Store({
       state.quarterHotclips.sort((a, b) => {
         return b.viewCount - a.viewCount
       })
+    },
+    setUser(state, user) {
+      state.login = true
+      state.user = user
     }
   },
   actions: {
@@ -66,6 +78,9 @@ export default new Vuex.Store({
     },
     sortHotclip({ state, commit }) {
       commit('sortHotclip')
+    },
+    setUser({ state, commit }, user) {
+      commit('setUser', user)
     }
   },
   modules: {
