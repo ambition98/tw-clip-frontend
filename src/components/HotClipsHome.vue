@@ -3,20 +3,16 @@
         <v-item-group class="hotclip-container">
             <v-container>
                 cnt: {{ getCnt() }},
-                len: {{ getLen() }}
                 period: {{ this.period }}
-                <v-row v-if="!isLoaded" justify="center">
+                <v-row v-if="loading" justify="center">
                         <ProgressCircular />
-                    <!-- <v-col v-for="n in 12" :key="n" align-self="start" md="3">
-                        <SkeletonLoader />
-                    </v-col> -->
                 </v-row>
                 <v-row v-else>
-                    <v-col v-for="clip in getHotclips()" :key="clip.id" align-self="start" md="3" class="clip-container">
+                    <v-col v-for="clip in hotclips" :key="clip.id" align-self="start" md="3" class="clip-container">
                         <v-hover v-slot="{ hover }">
                             <v-card :elevation="hover ? 16 : 2">
                                 <span class="duration clip-info">{{ getDuration(clip) }}</span>
-                                <v-img :src="clip.thumbnailUrl" @click="openModal(clip.embedUrl)" class="clip-img" />
+                                <v-img :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
                                 <span class="view-count clip-info">{{ getViewCount(clip) }}</span>
                                 <span class="created-at clip-info">{{ getCreatedAt(clip) }}</span>
                             </v-card>
@@ -24,51 +20,22 @@
                         <span class="b-name" @click="moveToBroadcasterPage(clip)">{{ clip.broadcasterName }}</span>
                         <span class="clip-title">{{ getTitle(clip) }}</span>
                     </v-col>
+                    <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
                 </v-row>
             </v-container>
         </v-item-group>
-        <v-dialog
-            v-model="modal"
-            width="1200px"
-        >
-            <v-card>
-                <iframe :src="embedUrl" width="100%" height="600" />
-
-                <v-divider></v-divider>
-
-                <div>
-                    원본동영상 |
-                    <span @click="copied">주소 복사</span> |
-                    카테고리 추가
-                </div>
-            </v-card>
-            <v-snackbar
-                :timeout="2000"
-                v-model="snackbar"
-            >
-                {{ snackbarText }}
-
-                <template v-slot:action="{ attrs }">
-                    <v-btn
-                        color="pink"
-                        text
-                        v-bind="attrs"
-                        @click="snackbar = false"
-                    >
-                        Close
-                    </v-btn>
-                </template>
-            </v-snackbar>
-        </v-dialog>
+        <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="modal=false"/>
     </div>
 </template>
 <script>
-// import SkeletonLoader from '@/components/SkeletonLoader.vue'
+import ClipModal from '@/components/ClipModal.vue'
+import InfiniteLoading from 'vue-infinite-loading'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 
 export default {
     components: {
-        // SkeletonLoader
+        ClipModal,
+        InfiniteLoading,
         ProgressCircular
     },
     data() {
@@ -77,50 +44,46 @@ export default {
             periodArr: ['week', 'month', 'quarter'],
             message: '',
             modal: false,
-            embedUrl: '',
             snackbar: false,
-            snackbarText: 'asdf'
+            snackbarText: '',
+            hotclips: [],
+            clip: '',
+            page: 1
         }
     },
     props: ['period'],
-    setup() {},
     created() {
-        if (!this.isLoaded) {
-            this.requestClips()
-        }
+        this.infiniteHandler()
     },
     computed: {
-        isLoaded() {
-            const loaded = this.getCnt() === this.getLen() * this.periodArr.length
-            if (loaded) {
-                this.$store.dispatch('sortHotclip')
-                return true
-            } else {
-                return false
-            }
+        loading: function() {
+            return this.hotclips.length < 1
+        }
+    },
+    watch: {
+        period: function() {
+            console.log('watch')
+            this.$destroy()
         }
     },
     methods: {
-        requestClips() {
-            const endedAt = this.getYmd(new Date())
-            this.periodArr.forEach(p => {
-                const startedAt = this.getStartedYmd(p)
-
-                this.$store.getters.getIsedolId.forEach(id => {
-                    this.$axios.get('/api/twitch/clips', {
-                        params: {
-                            broadcasterId: id,
-                            first: this.first,
-                            startedAt: startedAt,
-                            endedAt: endedAt
-                        }
-                    }).then(res => {
-                        res.data.dto.clips.forEach(clip => {
-                            this.pushClip(clip, p)
-                        })
-                        this.increseCnt()
+        infiniteHandler($state) {
+            console.log('page: ' + this.page)
+            this.$axios.get('/api/twitch/hotclips', {
+                params: {
+                    period: this.period,
+                    page: this.page
+                }
+            }).then(res => {
+                if (res.data.dto) {
+                    this.page++
+                    res.data.dto.forEach(clip => {
+                        this.hotclips.push(clip)
                     })
-                })
+                    $state.loaded()
+                } else {
+                    $state.complete()
+                }
             })
         },
         getStartedYmd(period) {
@@ -136,9 +99,6 @@ export default {
             }
 
             return this.getYmd(startedDate)
-        },
-        getYmd(date) {
-            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
         },
         getDuration(clip) {
             const duration = Math.round(clip.duration)
@@ -189,15 +149,9 @@ export default {
                 }
             })
         },
-        openModal(url) {
-            console.log(url)
-            this.embedUrl = url + '&parent=localhost'
+        openModal(clip) {
+            this.clip = clip
             this.modal = true
-        },
-        copied() {
-            this.$copyText(this.embedUrl)
-            this.snackbarText = '복사되었습니다.'
-            this.snackbar = true
         },
         getLen() {
             return this.$store.getters.getIsedolLogins.length
@@ -206,7 +160,7 @@ export default {
             return this.$store.getters.getHotclipLoadedCnt
         },
         getHotclips() {
-            return this.$store.getters.getHotclips(this.period)
+            // return this.$store.getters.getHotclips(this.period)
         },
         pushClip(clip, period) {
             const payload = {
@@ -270,5 +224,8 @@ export default {
     margin-right: 5px;
     cursor: pointer;
     color: purple;
+}
+#test {
+    width: 50%;
 }
 </style>

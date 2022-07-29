@@ -1,113 +1,90 @@
 <template>
-  <div class="text-center">
+  <div>
     <v-dialog
-      v-model="dialog"
-      width="500"
+      v-model="open"
+      width="1070px"
     >
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="red lighten-2"
-          dark
-          v-bind="attrs"
-          v-on="on"
-        >
-          Click Me
-        </v-btn>
-      </template>
-
       <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          Privacy Policy
-        </v-card-title>
-
-        <v-card-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </v-card-text>
+        <iframe :src="embedUrl" width="100%" height="600" allowfullscreen preload="metadata"/>
 
         <v-divider></v-divider>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="dialog = false"
-          >
-            I accept
-          </v-btn>
-        </v-card-actions>
+        <div style="width: 30%; text-align: center; margin: auto">
+            <v-container>
+                <v-row no-gutters style="height: 10px;">
+                    <v-col v-if="videoUrl" @click="clickModalIcon('mdi-video')" style="cursor: pointer; padding: 0px">
+                        <v-icon color="purple">mdi-video</v-icon>
+                    </v-col>
+                    <v-col v-else style="padding: 0px">
+                        <v-icon disabled>mdi-video-off</v-icon>
+                    </v-col>
+                    <v-col v-for="n in icon" :key="n" style="cursor: pointer; padding: 0px" @click="clickModalIcon(n)">
+                        <v-icon color="purple">{{ n }}</v-icon>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col v-for="n in iconDesc" :key="n" style="padding: 0px">
+                        {{ n }}
+                    </v-col>
+                </v-row>
+            </v-container>
+        </div>
       </v-card>
     </v-dialog>
+    <Snackbar v-if="snackbar" :snackbar="snackbar" :text="snackbarText" @close="snackbar=false"/>
   </div>
 </template>
 <script>
+import Snackbar from '@/components/Snackbar.vue'
+
 export default {
     name: 'ClipModal',
-    components: {},
+    components: {
+      Snackbar
+    },
+    props: ['modal', 'clip'],
     data() {
         return {
-            dialog: ''
+          icon: ['mdi-link', 'mdi-plus-box'],
+          iconDesc: ['원본동영상', '링크복사', '카테고리추가'],
+          snackbar: false,
+          snackbarText: '',
+          open: '',
+          url: '',
+          embedUrl: '',
+          videoId: ''
         }
     },
-    setup() {},
-    created() {},
-    mounted() {},
-    unmounted() {},
+    watch: {
+      open: function() {
+        if (this.open === false) {
+          this.$emit('close')
+        }
+      }
+    },
+    created() {
+      this.open = this.modal
+
+      this.url = this.clip.url
+      // this.embedUrl = this.clip.embedUrl + '&parent=localhost&autoplay=true&muted=false'
+      this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=true'
+      if (this.clip.videoId !== '') {
+          this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
+      }
+    },
     methods: {
+      clickModalIcon(icon) {
+        if (icon === 'mdi-video') {
+            console.log(this.videoUrl)
+            window.open(this.videoUrl)
+        } else if (icon === 'mdi-link') {
+            this.$copyText(this.url)
+            this.snackbarText = '복사되었습니다.'
+            this.snackbar = true
+        } else if (icon === 'mdi-plus-box') {
+            //
+        }
+      }
     }
 }
 </script>
-<style scoped>
-.overlay {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    z-index: 10;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-}
-.modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    z-index: 10;
-    top: 0;
-    left: 0;
-    /* width: 50%;
-    height: 50%; */
-}
-/* .modal-window {
-    background: #fff;
-    border-radius: 4px;
-    overflow: hidden;
-}
-.modal-content {
-    padding: 10px 20px;
-}
-.modal-footer {
-    background: #ccc;
-    padding: 10px;
-    text-align: right;
-}
-.modal-enter-active, .modal-leave-active {
-    transition: opacity 0.4s;
-}
-.modal-enter-active, .modal-leave-active > .modal-window {
-    transition: opacity 0.4s, transform 0.4s;
-}
-.modal-leave-active {
-  transition: opacity 0.6s ease 0.4s;
-}
-.modal-enter, .modal-leave-to {
-    opacity: 0;
-}
-.modal-enter, .modal-leave-to > .modal-window {
-    opacity: 0;
-    transform: translateY(-20px);
-} */
-</style>

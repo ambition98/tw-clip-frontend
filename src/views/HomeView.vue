@@ -12,28 +12,25 @@
       </v-tab>
     </v-tabs>
     <div v-if="tab === 0">
-      <HotClipsHome :period="items[tab].period" @openModal="openModal" />
+      <HotClipsHome :period="items[tab].period" key="0" />
     </div>
     <div v-else-if="tab === 1">
-      <HotClipsHome :period="items[tab].period" @openModal="openModal" />
+      <HotClipsHome :period="items[tab].period" key="1"/>
     </div>
     <div v-else>
-      <HotClipsHome :period="items[tab].period" @openModal="openModal" />
+      <HotClipsHome :period="items[tab].period" key="2"/>
     </div>
-    <!-- <ClipModal @close="closeModal" v-if="modal" @closeModal="closeModal" /> -->
   </div>
 </template>
 <script>
 import MainSearch from '@/components/MainSearch.vue'
 import HotClipsHome from '@/components/HotClipsHome.vue'
-// import ClipModal from '@/components/ClipModal.vue'
 
 export default {
   name: 'Home',
   components: {
     MainSearch,
     HotClipsHome
-    // ClipModal
   },
   data() {
     return {
@@ -44,16 +41,6 @@ export default {
       ],
       tab: 0,
       modal: false
-    }
-  },
-  methods: {
-    openModal() {
-      console.log('open')
-      this.modal = true
-    },
-    closeModal() {
-      console.log('close')
-      this.modal = false
     }
   }
 }

@@ -1,6 +1,5 @@
 <template>
   <div>
-    after login
   </div>
 </template>
 <script>

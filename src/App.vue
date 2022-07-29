@@ -38,7 +38,8 @@
         </div>
       </div>
       <div v-else>
-        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&scope=user:read:email&response_type=code">
+        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&scope=user:read:email&response_type=code"> -->
+        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&scope=user:read:email&response_type=code">
           <v-btn id="test" color="purple" elevation="2">로그인</v-btn>
         </a>
       </div>
