@@ -19,9 +19,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "afterlogin" */ '../views/AfterLoginView.vue')
   },
   {
-    path: '/broadcaster',
+    path: '/broadcaster/:id',
     name: 'broadcaster',
     component: () => import(/* webpackChunkName: "broadcaster" */ '../views/BroadcasterView.vue')
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import(/* webpackChunkName: "search" */ '../views/SearchResultView.vue')
   }
 ]
 

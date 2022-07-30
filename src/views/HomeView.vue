@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MainSearch />
+    <BroadcasterSearch />
     <v-tabs
       v-model="tab"
       color="purple"
@@ -23,13 +23,13 @@
   </div>
 </template>
 <script>
-import MainSearch from '@/components/MainSearch.vue'
+import BroadcasterSearch from '@/components/BroadcasterSearch.vue'
 import HotClipsHome from '@/components/HotClipsHome.vue'
 
 export default {
   name: 'Home',
   components: {
-    MainSearch,
+    BroadcasterSearch,
     HotClipsHome
   },
   data() {

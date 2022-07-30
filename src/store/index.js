@@ -5,16 +5,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    isedolLogins: ['viichan6', 'gosegugosegu', 'cotton__123', 'lilpaaaaaa', 'jingburger', 'vo_ine'],
-    isedolId: ['195641865', '707328484', '203667951', '169700336', '237570548', '702754423'],
-    weekHotclips: [],
-    monthHotclips: [],
-    quarterHotclips: [],
+    isedolInfo: [],
     hotclipLoadedCnt: 0,
     user: '',
     login: false
   },
   getters: {
+    getIsedolInfo(state) {
+      return state.isedolInfo
+    },
     getIsedolLogins(state) {
       return state.isedolLogins
     },
@@ -41,6 +40,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setIsedolInfo(state, isedolInfo) {
+      state.isedolInfo = isedolInfo
+    },
     pushClip(state, payload) {
       if (payload.period === 'week') {
         state.weekHotclips.push(payload.clip)
@@ -70,6 +72,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    setIsedolInfo({ state, commit }, isedolInfo) {
+      commit('setIsedolInfo', isedolInfo)
+    },
     pushClip({ state, commit }, payload) {
       commit('pushClip', payload)
     },

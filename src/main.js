@@ -22,8 +22,8 @@ const axios = require('axios')
 // }
 
 Vue.prototype.$axios = axios
-axios.defaults.baseURL = 'https://danyleee.com'
-// axios.defaults.baseURL = 'http://localhost'
+axios.defaults.baseURL = 'https://danyleee.com/api'
+// axios.defaults.baseURL = 'http://localhost/api'
 
 new Vue({
   router,

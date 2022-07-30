@@ -2,8 +2,6 @@
     <div>
         <v-item-group class="hotclip-container">
             <v-container>
-                cnt: {{ getCnt() }},
-                period: {{ this.period }}
                 <v-row v-if="loading" justify="center">
                         <ProgressCircular />
                 </v-row>
@@ -17,7 +15,7 @@
                                 <span class="created-at clip-info">{{ getCreatedAt(clip) }}</span>
                             </v-card>
                         </v-hover>
-                        <span class="b-name" @click="moveToBroadcasterPage(clip)">{{ clip.broadcasterName }}</span>
+                        <span class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</span>
                         <span class="clip-title">{{ getTitle(clip) }}</span>
                     </v-col>
                     <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
@@ -69,7 +67,7 @@ export default {
     methods: {
         infiniteHandler($state) {
             console.log('page: ' + this.page)
-            this.$axios.get('/api/twitch/hotclips', {
+            this.$axios.get('/storage/hotclips', {
                 params: {
                     period: this.period,
                     page: this.page
@@ -85,20 +83,6 @@ export default {
                     $state.complete()
                 }
             })
-        },
-        getStartedYmd(period) {
-            const now = new Date()
-            const startedDate = new Date()
-
-            if (period === 'week') {
-                startedDate.setDate(now.getDate() - 7)
-            } else if (period === 'month') {
-                startedDate.setMonth((now.getMonth() + 1) - 2)
-            } else {
-                startedDate.setMonth((now.getMonth() + 1) - 4)
-            }
-
-            return this.getYmd(startedDate)
         },
         getDuration(clip) {
             const duration = Math.round(clip.duration)
@@ -140,37 +124,19 @@ export default {
 
             return title
         },
-        moveToBroadcasterPage(clip) {
+        goToBroadcasterPage(id) {
+            const isedol = this.$store.getters.getIsedolInfo
             this.$router.push({
                 name: 'broadcaster',
                 params: {
-                    id: clip.broadcasterId,
-                    name: clip.broadcasterName
+                    id: id,
+                    user: isedol[id]
                 }
             })
         },
         openModal(clip) {
             this.clip = clip
             this.modal = true
-        },
-        getLen() {
-            return this.$store.getters.getIsedolLogins.length
-        },
-        getCnt() {
-            return this.$store.getters.getHotclipLoadedCnt
-        },
-        getHotclips() {
-            // return this.$store.getters.getHotclips(this.period)
-        },
-        pushClip(clip, period) {
-            const payload = {
-                period: period,
-                clip: clip
-            }
-            this.$store.dispatch('pushClip', payload)
-        },
-        increseCnt() {
-            this.$store.dispatch('increseHotClipLoadedCnt')
         }
     }
 }

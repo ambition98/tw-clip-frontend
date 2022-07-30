@@ -1,11 +1,4 @@
 <template>
-  <!-- <div>
-      <Header />
-      <v-main>
-      <router-view/>
-      </v-main>
-      <Footer />
-  </div> -->
   <v-app>
     <v-app-bar
       app
@@ -45,7 +38,7 @@
       </div>
     </v-app-bar>
     <v-main>
-      <router-view/>
+      <router-view :key="$route.fullPath"/>
     </v-main>
     <v-app-bar
       color="grey darken-2"
@@ -88,6 +81,12 @@ export default {
   data: () => ({
     user: ''
   }),
+  created() {
+    this.$axios.get('/storage/isedol')
+    .then(res => {
+      this.$store.dispatch('setIsedolInfo', res.data.dto)
+    })
+  },
   computed: {
     storeUser: function() {
       return this.$store.getters.getUser
@@ -141,7 +140,6 @@ export default {
 }
 .profile-img {
   border-radius: 100%;
-  border: 3px solid white;
   cursor: pointer;
 }
 </style>

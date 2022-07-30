@@ -9,6 +9,7 @@
                     solo
                     label="스트리머 검색"
                     clearable
+                    @keydown.enter="search"
                 ></v-text-field>
                 <!-- </v-layout> -->
             <!-- </v-row> -->
@@ -19,17 +20,21 @@
 <script>
 export default {
     name: 'MainSearch',
-    components: {},
     data() {
         return {
             keyword: ''
         }
     },
-    setup() {},
-    created() {},
-    mounted() {},
-    unmounted() {},
-    methods: {}
+    methods: {
+        search() {
+            this.$router.push({
+                name: 'search',
+                query: {
+                    keyword: this.keyword
+                }
+            })
+        }
+    }
 }
 </script>
 <style scoped>
