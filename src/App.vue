@@ -20,19 +20,18 @@
 
       <v-spacer></v-spacer>
 
-      <div v-if="user">
-        <div>
-          <v-img
-            max-width="50"
-            :src="user.profileImageUrl"
-            class="profile-img"
-            @click="goToProfile"
-          />
-        </div>
+      <div v-if="user" class="user">
+        <v-img
+          max-width="50"
+          :src="user.profileImageUrl"
+          class="profile-img"
+          @click="goToProfile"
+        />
+        <span class="user-name">{{ user.displayName }}</span>
       </div>
       <div v-else>
-        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&scope=user:read:email&response_type=code"> -->
-        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&scope=user:read:email&response_type=code">
+        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&scope=user:read:email&response_type=code">
+        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&scope=user:read:email&response_type=code"> -->
           <v-btn id="test" color="purple" elevation="2">로그인</v-btn>
         </a>
       </div>
@@ -135,12 +134,16 @@ export default {
 .github-span {
   color: white;
 }
-.test {
-  box-shadow: 5px 5px 5px 5px white;
+.user {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.user-name {
+  margin-left: 10px;
 }
 .profile-img {
   border-radius: 100%;
-  cursor: pointer;
 }
 </style>
 <style>

@@ -2,32 +2,33 @@
   <div>
     <v-dialog
       v-model="open"
-      width="1070px"
+      width="1080px"
+      dark
     >
       <v-card>
-        <iframe :src="embedUrl" width="100%" height="600" allowfullscreen preload="metadata"/>
+        <div class="iframe-container">
+          <iframe :src="embedUrl" frameborder="0px" allowfullscreen preload="metadata"/>
+        </div>
 
         <v-divider></v-divider>
 
-        <div style="width: 30%; text-align: center; margin: auto">
-            <v-container>
-                <v-row no-gutters style="height: 10px;">
-                    <v-col v-if="videoUrl" @click="clickModalIcon('mdi-video')" style="cursor: pointer; padding: 0px">
-                        <v-icon color="purple">mdi-video</v-icon>
-                    </v-col>
-                    <v-col v-else style="padding: 0px">
-                        <v-icon disabled>mdi-video-off</v-icon>
-                    </v-col>
-                    <v-col v-for="n in icon" :key="n" style="cursor: pointer; padding: 0px" @click="clickModalIcon(n)">
-                        <v-icon color="purple">{{ n }}</v-icon>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col v-for="n in iconDesc" :key="n" style="padding: 0px">
-                        {{ n }}
-                    </v-col>
-                </v-row>
-            </v-container>
+        <div class="icon-row">
+          <div v-if="videoUrl" @click="clickModalIcon('video')" class="icon-container">
+            <div class="icon"><v-icon color="purple lighten-1">mdi-video</v-icon></div>
+            <div class="icon-desc">원본동영상</div>
+          </div>
+          <div v-else class="icon-container">
+            <div class="icon"><v-icon disabled color="purple lighten-1">mdi-video-off</v-icon></div>
+            <div class="icon-desc">원본동영상</div>
+          </div>
+          <div @click="clickModalIcon('link')" class="icon-container">
+            <div class="icon"><v-icon color="purple lighten-1">mdi-link</v-icon></div>
+            <div class="icon-desc">링크복사</div>
+          </div>
+          <div @click="clickModalIcon('plus-box')" class="icon-container">
+            <div class="icon"><v-icon color="purple lighten-1">mdi-star</v-icon></div>
+            <div class="icon-desc">즐겨찾기</div>
+          </div>
         </div>
       </v-card>
     </v-dialog>
@@ -57,7 +58,7 @@ export default {
     },
     watch: {
       open: function() {
-        if (this.open === false) {
+        if (!this.open) {
           this.$emit('close')
         }
       }
@@ -66,25 +67,46 @@ export default {
       this.open = this.modal
 
       this.url = this.clip.url
-      // this.embedUrl = this.clip.embedUrl + '&parent=localhost&autoplay=true&muted=false'
-      this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=true'
+      this.embedUrl = this.clip.embedUrl + '&parent=localhost&autoplay=true&muted=false'
+      // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=true'
       if (this.clip.videoId !== '') {
           this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
       }
     },
     methods: {
       clickModalIcon(icon) {
-        if (icon === 'mdi-video') {
+        if (icon === 'video') {
             console.log(this.videoUrl)
             window.open(this.videoUrl)
-        } else if (icon === 'mdi-link') {
+        } else if (icon === 'link') {
             this.$copyText(this.url)
             this.snackbarText = '복사되었습니다.'
             this.snackbar = true
-        } else if (icon === 'mdi-plus-box') {
+        } else if (icon === 'plus-box') {
             //
         }
       }
     }
 }
 </script>
+<style scoped>
+.iframe-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+}
+.iframe-container iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.icon-row {
+  text-align: center;
+  margin: auto;
+}
+.icon-container {
+  display: inline-block;
+  margin: 10px;
+  cursor: pointer;
+}
+</style>

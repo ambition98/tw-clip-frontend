@@ -1,36 +1,35 @@
 <template>
     <div>
-        <BroadcasterSearch />
-        <div style="width: 50%; margin: auto">
-            <v-container>
-                <v-row>
-                    <v-col
-                        v-for="partner in partners"
-                        :key="partner.id"
-                        align-self="start"
-                        cols="12"
-                    >
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                                :elevation="hover ? 10 : 5"
-                                @click="goToBroadcasterPage(partner)"
-                            >
-                                <div class="card">
-                                    <div style="display: flex; align-items: center;">
-                                        <v-img max-width="100" :src="partner.profileImageUrl" class="img" style="display: inline-block"></v-img>
-                                        <div style="font-weight: bold; font-size: 1.1rem">
-                                            {{ partner.displayName }}
-                                            <v-icon color="purple" style="bottom: 2px;">mdi-check-circle</v-icon>
-                                        </div>
+        <BroadcasterSearch :k="$route.query.keyword" />
+        <v-container>
+            <v-row>
+                <v-col
+                    v-for="partner in partners"
+                    :key="partner.id"
+                    align-self="start"
+                    md="6"
+                    sm="6"
+                >
+                    <v-hover v-slot="{ hover }">
+                        <v-card
+                            :elevation="hover ? 10 : 5"
+                            @click="goToBroadcasterPage(partner)"
+                        >
+                            <div class="card">
+                                <div style="display: flex; align-items: center;">
+                                    <v-img max-width="100" :src="partner.profileImageUrl" class="img" style="display: inline-block"></v-img>
+                                    <div style="font-weight: bold; font-size: 1.1rem">
+                                        {{ partner.displayName }}
+                                        <v-icon color="purple" style="bottom: 2px;">mdi-check-circle</v-icon>
                                     </div>
-                                    <div style="margin-top: 10px">{{ partner.description}}</div>
                                 </div>
-                            </v-card>
-                        </v-hover>
-                    </v-col>
-                </v-row>
-            </v-container>
-        </div>
+                                <div style="margin-top: 10px">{{ partner.description}}</div>
+                            </div>
+                        </v-card>
+                    </v-hover>
+                </v-col>
+            </v-row>
+        </v-container>
 
         <v-divider style="margin: 20px 0px"></v-divider>
 
@@ -62,17 +61,6 @@
                 </v-col>
             </v-row>
         </v-container>
-        파트너
-        <div v-for="partner in partners" :key="partner.id">
-            {{ partner }}
-        </div>
-
-        <v-divider></v-divider>
-
-        일반
-        <div v-for="user in users" :key="user.id">
-            {{ user }}
-        </div>
     </div>
 </template>
 <script>

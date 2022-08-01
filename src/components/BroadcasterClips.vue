@@ -1,90 +1,91 @@
 <template>
     <div>
-        <v-item-group class="hotclip-container">
+        <v-item-group class="clips-container">
             <v-container>
-                <v-row v-if="loading" justify="center">
+                <v-row v-if="!loadedClip" justify="center">
                         <ProgressCircular />
                 </v-row>
-                <v-row v-else>
-                    <v-col v-for="clip in hotclips" :key="clip.id" align-self="start" md="3" class="clip-container">
-                        <Clip :clip="clip" />
-                        <!-- <v-hover v-slot="{ hover }">
+                <v-row v-else-if="existedClip">
+                    <v-col v-for="clip in clips" :key="clip.id" align-self="start" md="3" class="clip-container">
+                        <v-hover v-slot="{ hover }">
                             <v-card :elevation="hover ? 16 : 2">
-                                <div class="duration clip-info rounded-lg">{{ getDuration(clip) }}</div>
+                                <span class="duration clip-info rounded-lg">{{ getDuration(clip) }}</span>
                                 <v-img :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
-                                <div class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</div>
-                                <div class="created-at clip-info rounded-lg">{{ getCreatedAt(clip) }}</div>
+                                <span class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</span>
+                                <span class="created-at clip-info rounded-lg">{{ getCreatedAt(clip) }}</span>
                             </v-card>
                         </v-hover>
-                        <div class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</div>
-                        <div class="clip-title">{{ getTitle(clip) }}</div> -->
+                        <span class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</span>
+                        <span class="clip-title">{{ getTitle(clip) }}</span>
                     </v-col>
                     <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
                 </v-row>
+                <v-row v-else>
+                    해당 기간의 클립이 존재하지 않습니다
+                </v-row>
             </v-container>
         </v-item-group>
-        <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="closeModal" :key="key"/>
+        <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="modal=false"/>
     </div>
 </template>
 <script>
 import ClipModal from '@/components/ClipModal.vue'
 import InfiniteLoading from 'vue-infinite-loading'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import Clip from '@/components/Clip.vue'
 
 export default {
+    name: 'BroadcasterClips',
+    props: ['id', 'startedAt', 'endedAt'],
     components: {
         ClipModal,
         InfiniteLoading,
-        ProgressCircular,
-        Clip
+        ProgressCircular
     },
     data() {
         return {
-            first: 4,
-            periodArr: ['week', 'month', 'quarter'],
             message: '',
             modal: false,
             snackbar: false,
             snackbarText: '',
-            hotclips: [],
+            clips: [],
+            loadedClip: false,
             clip: '',
-            page: 1,
-            key: 1
+            cursor: ''
         }
     },
-    props: ['period'],
     created() {
+        console.log(this.id)
+        console.log(this.startedAt)
+        console.log(this.endedAt)
         this.infiniteHandler()
     },
     computed: {
-        loading: function() {
-            return this.hotclips.length < 1
+        existedClip: function() {
+            return this.clips.length > 1
         }
     },
     methods: {
         infiniteHandler($state) {
-            console.log('page: ' + this.page)
-            this.$axios.get('/storage/hotclips', {
-                params: {
-                    period: this.period,
-                    page: this.page
-                }
+            this.$axios.get('/twitch/clips', {
+            params: {
+                broadcasterId: this.id,
+                first: 100,
+                startedAt: this.startedAt,
+                endedAt: this.endedAt,
+                after: this.cursor
+            }
             }).then(res => {
-                if (res.data.dto) {
-                    this.page++
-                    res.data.dto.forEach(clip => {
-                        this.hotclips.push(clip)
+                this.loadedClip = true
+                if (res.data.dto.clips.length > 1) {
+                    res.data.dto.clips.forEach(clip => {
+                        this.clips.push(clip)
                     })
+                    this.cursor = res.data.dto.cursor
                     $state.loaded()
                 } else {
                     $state.complete()
                 }
             })
-        },
-        closeModal() {
-            this.modal = false
-            this.key++
         },
         getDuration(clip) {
             const duration = Math.round(clip.duration)
@@ -126,16 +127,6 @@ export default {
 
             return title
         },
-        goToBroadcasterPage(id) {
-            const isedol = this.$store.getters.getIsedolInfo
-            this.$router.push({
-                name: 'broadcaster',
-                params: {
-                    id: id,
-                    user: isedol[id]
-                }
-            })
-        },
         openModal(clip) {
             this.clip = clip
             this.modal = true
@@ -144,24 +135,12 @@ export default {
 }
 </script>
 <style scoped>
-.hotclip-container {
+.clips-container {
     margin-top: 70px;
-}
-.hotclip-top {
-    border-bottom: 1px soild black;
 }
 .clip-img {
     margin-bottom: 5px;
     cursor: pointer;
-}
-.hotclip-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-.hotclip-more {
-    margin-left: 10px;
-    position: relative;
-    bottom: 2px;
 }
 .clip-container {
     position: relative;
@@ -173,7 +152,7 @@ export default {
     z-index: 1;
     padding: 2px 6px;
 }
-/* .duration {
+.duration {
     top: 10px;
     left: 10px;
 }
@@ -184,18 +163,12 @@ export default {
 .created-at {
     bottom: 10px;
     right: 10px;
-} */
+}
 .b-name {
     font-weight: bold;
     font-size: 1.08rem;
     margin-right: 5px;
-    cursor: pointer;
     color: purple;
-    display: inline-block;
-    overflow: hidden;
-}
-.clip-title {
-    display: inline-block;
-    overflow: hidden;
+    cursor: pointer;
 }
 </style>

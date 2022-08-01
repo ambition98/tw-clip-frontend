@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <v-container>
+    <iframe src="https://clips.twitch.tv/embed?clip=UgliestPlayfulMosquitoWoofer-eYyZWzJr9ovcxOdN&parent=localhost&autoplay=true&muted=false" frameborder="0"></iframe>
     <BroadcasterSearch />
     <v-tabs
       v-model="tab"
@@ -20,7 +21,7 @@
     <div v-else>
       <HotClipsHome :period="items[tab].period" key="2"/>
     </div>
-  </div>
+  </v-container>
 </template>
 <script>
 import BroadcasterSearch from '@/components/BroadcasterSearch.vue'
@@ -39,8 +40,7 @@ export default {
         { period: 'month', title: '월간 핫클립' },
         { period: 'quarter', title: '분기별 핫클립' }
       ],
-      tab: 0,
-      modal: false
+      tab: 0
     }
   }
 }

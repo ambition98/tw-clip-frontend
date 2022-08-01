@@ -13,7 +13,7 @@ export default {
   created() {
     const code = this.$route.query.code
 
-    this.$axios.get('/api/twitch/oauth', {
+    this.$axios.get('/twitch/oauth', {
       params: {
         code: code
       }

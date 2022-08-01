@@ -20,6 +20,10 @@
 <script>
 export default {
     name: 'MainSearch',
+    props: ['k'],
+    created() {
+        this.keyword = this.k
+    },
     data() {
         return {
             keyword: ''
@@ -30,7 +34,7 @@ export default {
             this.$router.push({
                 name: 'search',
                 query: {
-                    keyword: this.keyword
+                    keyword: this.keyword.trim()
                 }
             })
         }
