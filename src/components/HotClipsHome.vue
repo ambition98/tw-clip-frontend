@@ -64,7 +64,7 @@ export default {
     },
     methods: {
         infiniteHandler($state) {
-            console.log('page: ' + this.page)
+            // console.log('page: ' + this.page)
             this.$axios.get('/storage/hotclips', {
                 params: {
                     period: this.period,
@@ -173,18 +173,6 @@ export default {
     z-index: 1;
     padding: 2px 6px;
 }
-/* .duration {
-    top: 10px;
-    left: 10px;
-}
-.view-count {
-    bottom: 10px;
-    left: 10px;
-}
-.created-at {
-    bottom: 10px;
-    right: 10px;
-} */
 .b-name {
     font-weight: bold;
     font-size: 1.08rem;

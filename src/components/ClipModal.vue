@@ -67,7 +67,7 @@ export default {
       this.open = this.modal
 
       this.url = this.clip.url
-      this.embedUrl = this.clip.embedUrl + '&parent=localhost&autoplay=true&muted=false'
+      this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
       // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=true'
       if (this.clip.videoId !== '') {
           this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
@@ -93,6 +93,7 @@ export default {
 .iframe-container {
   position: relative;
   width: 100%;
+  min-height: 500px;
   padding-bottom: 56.25%;
 }
 .iframe-container iframe {

@@ -3,13 +3,13 @@
         <v-hover v-slot="{ hover }">
             <v-card :elevation="hover ? 16 : 2">
                 <div class="duration clip-info rounded-lg">{{ getDuration(clip) }}</div>
-                <v-img :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
+                <v-img eager :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
                 <div class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</div>
                 <div class="created-at clip-info rounded-lg">{{ getCreatedAt(clip) }}</div>
-                <div class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</div>
-                <div class="clip-title">{{ getTitle(clip) }}</div>
             </v-card>
         </v-hover>
+        <div class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</div>
+        <div class="clip-title">{{ getTitle(clip) }}</div>
         <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="closeModal" key="0"/>
     </div>
 </template>

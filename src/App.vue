@@ -22,7 +22,7 @@
 
       <div v-if="user" class="user">
         <v-img
-          max-width="50"
+          max-width="40"
           :src="user.profileImageUrl"
           class="profile-img"
           @click="goToProfile"
@@ -30,7 +30,7 @@
         <span class="user-name">{{ user.displayName }}</span>
       </div>
       <div v-else>
-        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&scope=user:read:email&response_type=code">
+        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&response_type=code">
         <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&scope=user:read:email&response_type=code"> -->
           <v-btn id="test" color="purple" elevation="2">로그인</v-btn>
         </a>
@@ -78,13 +78,17 @@ export default {
   component: {
   },
   data: () => ({
-    user: ''
+    user: '',
+    userLoaded: false
   }),
   created() {
-    this.$axios.get('/storage/isedol')
-    .then(res => {
-      this.$store.dispatch('setIsedolInfo', res.data.dto)
-    })
+    console.log('App.vue created()')
+    this.requestAndStoreIsedol()
+    const tk = this.$cookies.get('tk')
+    if (tk) {
+      const user = this.requestUser(tk)
+      this.user = user
+    }
   },
   computed: {
     storeUser: function() {
@@ -105,6 +109,40 @@ export default {
     },
     goToProfile() {
       console.log('click')
+    },
+    requestAndStoreIsedol() {
+      this.$axios.get('/storage/isedol')
+      .then(res => {
+        this.$store.dispatch('setIsedolInfo', res.data.dto)
+      })
+    },
+    requestUser(tk) {
+      this.$axios.get('/user', {
+        headers: {
+          Authorization: 'Bearer ' + tk
+        }
+      }).then(res => {
+        this.user = res.data.dto
+      }).catch(err => {
+        if (err.response.status === 401) {
+          this.refreshToken(tk)
+        }
+      })
+    },
+    refreshToken(tk) {
+      console.log('refresh')
+      this.$axios.get('/refresh', {
+        headers: {
+          Authorization: 'Bearer ' + tk
+        }
+      }).then(res => {
+        console.log(res.data)
+        this.user = res.data.dto.twitchUser
+        this.$cookies.set('tk', res.data.dto.accessToken)
+      })
+    },
+    getUser() {
+      return this.$store.getters.getUser
     }
   }
 }

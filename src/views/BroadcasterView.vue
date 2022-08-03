@@ -1,7 +1,6 @@
 <template>
     <div>
         <v-container>
-            <iframe src="https://clips.twitch.tv/embed?clip=UgliestPlayfulMosquitoWoofer-eYyZWzJr9ovcxOdN&parent=localhost&autoplay=true&muted=false" frameborder="0"></iframe>
             <BroadcasterSearch :k="user.displayName"/>
             <div class="user-info">
                 <div class="user-img">
