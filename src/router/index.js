@@ -47,6 +47,22 @@ const routes = [
       title: '이세돌 핫클립'
     },
     component: () => import(/* webpackChunkName: "test" */ '../views/TestView.vue')
+  },
+  {
+    path: '/category',
+    name: 'category',
+    meta: {
+      title: '이세돌 핫클립'
+    },
+    component: () => import(/* webpackChunkName: "category" */ '../views/CategoryView.vue')
+  },
+  {
+    path: '/favorite',
+    name: 'favorite',
+    meta: {
+      title: '이세돌 핫클립'
+    },
+    component: () => import(/* webpackChunkName: "favorite" */ '../views/FavoriteView.vue')
   }
 ]
 

@@ -13,21 +13,15 @@
         <v-divider></v-divider>
 
         <div class="icon-row">
-          <div v-if="videoUrl" @click="clickModalIcon('video')" class="icon-container">
-            <div class="icon"><v-icon color="purple lighten-1">mdi-video</v-icon></div>
-            <div class="icon-desc">원본동영상</div>
-          </div>
-          <div v-else class="icon-container">
-            <div class="icon"><v-icon disabled color="purple lighten-1">mdi-video-off</v-icon></div>
-            <div class="icon-desc">원본동영상</div>
-          </div>
-          <div @click="clickModalIcon('link')" class="icon-container">
-            <div class="icon"><v-icon color="purple lighten-1">mdi-link</v-icon></div>
-            <div class="icon-desc">링크복사</div>
-          </div>
-          <div @click="clickModalIcon('plus-box')" class="icon-container">
-            <div class="icon"><v-icon color="purple lighten-1">mdi-star</v-icon></div>
-            <div class="icon-desc">즐겨찾기</div>
+          <div
+            @click="clickModalIcon(item.icon)"
+              class="icon-container"
+              v-for="item in items"
+              :key="item.title"
+              :style="item.style"
+              >
+            <div class="icon"><v-icon color="purple lighten-1" :disabled="item.disabled" >{{ item.icon }}</v-icon></div>
+            <div class="icon-desc">{{ item.title }}</div>
           </div>
         </div>
       </v-card>
@@ -46,8 +40,12 @@ export default {
     props: ['modal', 'clip'],
     data() {
         return {
-          icon: ['mdi-link', 'mdi-plus-box'],
-          iconDesc: ['원본동영상', '링크복사', '카테고리추가'],
+          items: [
+            { icon: 'mdi-video', title: '원본동영상', disabled: false, style: '' },
+            { icon: 'mdi-link', title: '링크복사', disabled: false, style: '' },
+            { icon: 'mdi-star-outline', title: '즐겨찾기 추가', disabled: false, style: '' },
+            { icon: 'mdi-plus-box', title: '카테고리추가', disabled: false, style: '' }
+          ],
           snackbar: false,
           snackbarText: '',
           open: '',
@@ -65,26 +63,106 @@ export default {
     },
     created() {
       this.open = this.modal
-
       this.url = this.clip.url
       this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
-      // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=true'
+      // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=false&muted=false'
       if (this.clip.videoId !== '') {
           this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
+      } else {
+        this.items[0].icon = 'mdi-video-off'
+        this.items[0].disabled = true
+        this.items[0].style = 'cursor: auto;'
       }
+
+      this.setFavoriteIcon(true)
     },
     methods: {
       clickModalIcon(icon) {
-        if (icon === 'video') {
-            console.log(this.videoUrl)
-            window.open(this.videoUrl)
-        } else if (icon === 'link') {
-            this.$copyText(this.url)
-            this.snackbarText = '복사되었습니다.'
-            this.snackbar = true
-        } else if (icon === 'plus-box') {
+        if (icon === 'mdi-video') {
+          console.log(this.videoUrl)
+          window.open(this.videoUrl)
+        } else if (icon === 'mdi-link') {
+          this.$copyText(this.url)
+          this.snackbarText = '복사되었습니다.'
+          this.snackbar = true
+        } else if (icon === 'mdi-star-outline') {
+          console.log('post')
+          this.postFavorite(true)
+        } else if (icon === 'mdi-star') {
+          console.log('delete')
+          this.deleteFavorite(true)
+        } else if (icon === 'mdi-plus-box') {
             //
         }
+      },
+      postFavorite(first) {
+        const data = { clipId: this.clip.id }
+        this.$axios.post('/user/favorite', data
+        ).then(res => {
+          console.log(res.data)
+            this.snackbarText = '즐겨찾기에 추가되었습니다.'
+            this.snackbar = true
+            this.items[2].icon = 'mdi-star'
+        }).catch(err => {
+          const status = err.response.status
+          if (first && status === 401) {
+            this.refreshToken(this.postFavorite)
+          } else if (status === 409) {
+            this.snackbarText = '이미 즐겨찾기된 클립입니다.'
+            this.snackbar = true
+          } else {
+            alert('다시 로그인해 주세요')
+          }
+        })
+      },
+      deleteFavorite(first) {
+        this.$axios.delete('/user/favorite/' + this.clip.id)
+        .then(res => {
+          console.log(res.data)
+            this.snackbarText = '즐겨찾기에서 삭제되었습니다.'
+            this.snackbar = true
+            this.items[2].icon = 'mdi-star-outline'
+        }).catch(err => {
+          const status = err.response.status
+          if (first && status === 401) {
+            this.refreshToken(this.postFavorite)
+          } else if (status === 409) {
+            // alert('이미 추가된 클립입니다.')
+            this.snackbarText = '이미 즐겨찾기된 클립입니다.'
+            this.snackbar = true
+          } else {
+            alert('다시 로그인해 주세요')
+          }
+        })
+      },
+      setFavoriteIcon(first) {
+        this.$axios.get('/user/favorite/exists', {
+          params: {
+            clipId: this.clip.id
+          }
+        }).then(res => {
+          console.log('exists: ', res.data.dto)
+          if (res.data.dto) {
+            this.items[2].icon = 'mdi-star'
+          }
+        }).catch(err => {
+          const status = err.response.status
+          if (first && status === 401) {
+            this.refreshToken(this.setFavoriteIcon)
+          }
+        })
+      },
+      async refreshToken(method) {
+        try {
+          const res = await this.$axios.get('/refresh')
+          this.setUser(res.data.dto)
+          method(false)
+        } catch (err) {
+          alert('다시 로그인해 주세요')
+        }
+      },
+      setUser(user) {
+        this.$store.dispatch('setUser', user)
       }
     }
 }

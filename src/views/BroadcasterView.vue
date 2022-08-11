@@ -9,6 +9,9 @@
                 <div>
                     <div class="user-name">
                         {{ user.displayName }}
+                        <span v-if="user.broadcasterType === 'partner'">
+                            <v-icon color="purple" style="bottom: 2px;">mdi-check-circle</v-icon>
+                        </span>
                     </div>
                     <div>
                         {{ user.description }}

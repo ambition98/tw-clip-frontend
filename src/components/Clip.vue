@@ -136,11 +136,11 @@ export default {
     margin-right: 5px;
     cursor: pointer;
     color: purple;
-    display: inline-block;
+    display: inline;
     overflow: hidden;
 }
 .clip-title {
-    display: inline-block;
+    display: inline;
     overflow: hidden;
 }
 </style>

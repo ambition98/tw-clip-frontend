@@ -5,26 +5,30 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import VueCookies from 'vue-cookies'
 import VueClipboard from 'vue-clipboard2'
+import ProfileMenu from '@/components/ProfileMenu.vue'
+// import axios from 'axios'
+// import axios from 'axios'
+// import AxiosPlugin from 'vue-axios-cors'
 
-// import Header from './components/layout/Header'
-// import Footer from './components/layout/Footer'
+// axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
+// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 
-// Vue.component('Header', Header)
-// Vue.component('Footer', Footer)
+// Vue.use(AxiosPlugin)
+// Vue.use(axios)
+// const cookieConfig = { path: '/', expires: 'Session', sameSite: 'Strict', secure: 'true', httpOnly: 'true' }
+const axios = require('axios')
+// axios.defaults.baseURL = 'https://danyleee.com/api'
+axios.defaults.baseURL = 'http://localhost/api'
+axios.defaults.withCredentials = true
+// const cors = require('cors')
+// const corsOptions = {
+  //   exposeHeaders: 'Authorization'
+  // }
+Vue.prototype.$axios = axios
 Vue.config.productionTip = false
 Vue.use(VueCookies)
 Vue.use(VueClipboard)
-
-const axios = require('axios')
-// const cors = require('cors')
-// const corsOptions = {
-//   exposeHeaders: 'Authorization'
-// }
-
-Vue.prototype.$axios = axios
-// axios.defaults.baseURL = 'https://danyleee.com/api'
-axios.defaults.baseURL = 'http://localhost/api'
-
+Vue.use(ProfileMenu)
 new Vue({
   router,
   store,

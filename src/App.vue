@@ -19,23 +19,58 @@
       </router-link>
 
       <v-spacer></v-spacer>
-
-      <div v-if="user" class="user">
+      <div v-if="userLoading"></div>
+      <div v-else-if="storeUser" class="user" @click="drawer = !drawer">
         <v-img
           max-width="40"
-          :src="user.profileImageUrl"
+          :src="storeUser.profileImageUrl"
           class="profile-img"
-          @click="goToProfile"
         />
-        <span class="user-name">{{ user.displayName }}</span>
+        <span class="user-name">{{ storeUser.displayName }}</span>
       </div>
       <div v-else>
         <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&response_type=code">
-        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&scope=user:read:email&response_type=code"> -->
+        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&response_type=code"> -->
           <v-btn id="test" color="purple" elevation="2">로그인</v-btn>
         </a>
       </div>
     </v-app-bar>
+    <v-navigation-drawer
+      v-model="drawer"
+      fixed
+      temporary
+      right
+    >
+      <v-list-item>
+        <v-list-item-avatar>
+          <v-img :src="storeUser.profileImageUrl" v-if="storeUser"></v-img>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title v-if="storeUser">{{ storeUser.displayName }}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list dense>
+          <v-list-item
+            v-for="item in items"
+            :key="item.title"
+            @click="clickList(item.title)"
+            link
+          >
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
     <v-main>
       <router-view :key="$route.fullPath"/>
     </v-main>
@@ -73,26 +108,28 @@
 </template>
 
 <script>
+
 export default {
   name: 'App',
   component: {
   },
   data: () => ({
-    user: '',
-    userLoaded: false
+    // user: '',
+    userLoading: false,
+    drawer: false,
+    items: [
+      { title: '내 카테고리', icon: 'mdi-view-dashboard' },
+      { title: '즐겨찾기한 클립', icon: 'mdi-star' },
+      { title: '로그아웃', icon: 'mdi-logout' }
+    ]
   }),
   created() {
-    console.log('App.vue created()')
     this.requestAndStoreIsedol()
-    const tk = this.$cookies.get('tk')
-    if (tk) {
-      const user = this.requestUser(tk)
-      this.user = user
-    }
+    this.requestUser(true)
   },
   computed: {
     storeUser: function() {
-      return this.$store.getters.getUser
+      return this.getUser()
     }
   },
   watch: {
@@ -107,42 +144,67 @@ export default {
     goToGithubBack() {
       window.open('https://github.com/ambition98/isedol-clip-backend')
     },
-    goToProfile() {
-      console.log('click')
-    },
     requestAndStoreIsedol() {
-      this.$axios.get('/storage/isedol')
+      this.$axios.get('/storage/isedol', {
+        withCredentials: true
+      })
       .then(res => {
         this.$store.dispatch('setIsedolInfo', res.data.dto)
       })
     },
-    requestUser(tk) {
-      this.$axios.get('/user', {
-        headers: {
-          Authorization: 'Bearer ' + tk
+    async requestUser(first) {
+      console.log('requestUser')
+      this.userLoading = true
+      try {
+        const res = await this.$axios.get('/user')
+        console.log('/user: ', res.data.dto)
+        this.setUser(res.data.dto)
+      } catch (err) {
+        console.log('/user err', err.response)
+        if (first && err.response.status === 401) {
+          this.refreshToken()
+        } else {
+          // alert('다시 로그인해 주세요')
         }
-      }).then(res => {
-        this.user = res.data.dto
-      }).catch(err => {
-        if (err.response.status === 401) {
-          this.refreshToken(tk)
-        }
-      })
+      }
+      this.userLoading = false
     },
-    refreshToken(tk) {
-      console.log('refresh')
-      this.$axios.get('/refresh', {
-        headers: {
-          Authorization: 'Bearer ' + tk
-        }
-      }).then(res => {
-        console.log(res.data)
-        this.user = res.data.dto.twitchUser
-        this.$cookies.set('tk', res.data.dto.accessToken)
-      })
+    async logout() {
+      this.userLoading = true
+      const res = await this.$axios.post('/logout')
+      console.log(res)
+      this.setUser('')
+      this.userLoading = false
+    },
+    async refreshToken() {
+      console.log('refreshToken')
+      let res = ''
+      try {
+        res = await this.$axios.get('/refresh')
+        this.setUser(res.data.dto)
+        console.log('refershed')
+        this.requestUser(false)
+      } catch (err) {
+        this.setUser('')
+        // alert('다시 로그인 해 주세요')
+      }
+    },
+    clickList(title) {
+      if (title === '로그아웃') {
+        this.logout()
+        this.setUser('')
+        this.$router.go()
+      } else if (title === '내 카테고리') {
+        this.$router.push('/category')
+      } else if (title === '즐겨찾기한 클립') {
+        this.$router.push('/favorite')
+      }
     },
     getUser() {
       return this.$store.getters.getUser
+    },
+    setUser(user) {
+      this.$store.dispatch('setUser', user)
     }
   }
 }

@@ -8,16 +8,6 @@
                 <v-row v-else>
                     <v-col v-for="clip in hotclips" :key="clip.id" align-self="start" md="3" class="clip-container">
                         <Clip :clip="clip" />
-                        <!-- <v-hover v-slot="{ hover }">
-                            <v-card :elevation="hover ? 16 : 2">
-                                <div class="duration clip-info rounded-lg">{{ getDuration(clip) }}</div>
-                                <v-img :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
-                                <div class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</div>
-                                <div class="created-at clip-info rounded-lg">{{ getCreatedAt(clip) }}</div>
-                            </v-card>
-                        </v-hover>
-                        <div class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</div>
-                        <div class="clip-title">{{ getTitle(clip) }}</div> -->
                     </v-col>
                     <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
                 </v-row>
@@ -64,7 +54,6 @@ export default {
     },
     methods: {
         infiniteHandler($state) {
-            // console.log('page: ' + this.page)
             this.$axios.get('/storage/hotclips', {
                 params: {
                     period: this.period,
@@ -73,6 +62,7 @@ export default {
             }).then(res => {
                 if (res.data.dto) {
                     this.page++
+                    console.log(res.data)
                     res.data.dto.forEach(clip => {
                         this.hotclips.push(clip)
                     })
@@ -165,25 +155,5 @@ export default {
 }
 .clip-container {
     position: relative;
-}
-.clip-info {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    z-index: 1;
-    padding: 2px 6px;
-}
-.b-name {
-    font-weight: bold;
-    font-size: 1.08rem;
-    margin-right: 5px;
-    cursor: pointer;
-    color: purple;
-    display: inline-block;
-    overflow: hidden;
-}
-.clip-title {
-    display: inline-block;
-    overflow: hidden;
 }
 </style>

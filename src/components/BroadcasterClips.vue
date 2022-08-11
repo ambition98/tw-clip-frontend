@@ -7,16 +7,7 @@
                 </v-row>
                 <v-row v-else-if="existedClip">
                     <v-col v-for="clip in clips" :key="clip.id" align-self="start" md="3" class="clip-container">
-                        <v-hover v-slot="{ hover }">
-                            <v-card :elevation="hover ? 16 : 2">
-                                <span class="duration clip-info rounded-lg">{{ getDuration(clip) }}</span>
-                                <v-img :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
-                                <span class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</span>
-                                <span class="created-at clip-info rounded-lg">{{ getCreatedAt(clip) }}</span>
-                            </v-card>
-                        </v-hover>
-                        <span class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</span>
-                        <span class="clip-title">{{ getTitle(clip) }}</span>
+                        <Clip :clip="clip" />
                     </v-col>
                     <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
                 </v-row>
@@ -32,6 +23,7 @@
 import ClipModal from '@/components/ClipModal.vue'
 import InfiniteLoading from 'vue-infinite-loading'
 import ProgressCircular from '@/components/ProgressCircular.vue'
+import Clip from '@/components/Clip.vue'
 
 export default {
     name: 'BroadcasterClips',
@@ -39,7 +31,8 @@ export default {
     components: {
         ClipModal,
         InfiniteLoading,
-        ProgressCircular
+        ProgressCircular,
+        Clip
     },
     data() {
         return {
@@ -144,31 +137,5 @@ export default {
 }
 .clip-container {
     position: relative;
-}
-.clip-info {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    z-index: 1;
-    padding: 2px 6px;
-}
-.duration {
-    top: 10px;
-    left: 10px;
-}
-.view-count {
-    bottom: 10px;
-    left: 10px;
-}
-.created-at {
-    bottom: 10px;
-    right: 10px;
-}
-.b-name {
-    font-weight: bold;
-    font-size: 1.08rem;
-    margin-right: 5px;
-    color: purple;
-    cursor: pointer;
 }
 </style>
