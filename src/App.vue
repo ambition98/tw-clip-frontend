@@ -1,23 +1,16 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="deep-purple darken-1"
-      dark
-    >
-      <router-link to="/" class="router-link">
-        <div class="d-flex align-center">
-          <v-img
-            id="isedol-logo"
-            contain
-            src="@/assets/isedol_logo.png"
-            transition="scale-transition"
-            width="50"
-          />
-          <span id="title">이세돌 핫클립</span>
-        </div>
-      </router-link>
-
+    <div class="header">
+      <div class="title" @click="goToMain">
+        <v-img
+          class="isedol-logo"
+          contain
+          src="@/assets/isedol_logo.png"
+          transition="scale-transition"
+          width="50"
+        />
+      <div class="title-text">이세돌 핫클립</div>
+      </div>
       <v-spacer></v-spacer>
       <div v-if="userLoading"></div>
       <div v-else-if="storeUser" class="user" @click="drawer = !drawer">
@@ -34,7 +27,7 @@
           <v-btn id="test" color="purple" elevation="2">로그인</v-btn>
         </a>
       </div>
-    </v-app-bar>
+    </div>
     <v-navigation-drawer
       v-model="drawer"
       fixed
@@ -53,7 +46,7 @@
 
       <v-divider></v-divider>
 
-      <v-list dense>
+      <v-list>
           <v-list-item
             v-for="item in items"
             :key="item.title"
@@ -74,36 +67,30 @@
     <v-main>
       <router-view :key="$route.fullPath"/>
     </v-main>
-    <v-app-bar
-      color="grey darken-2"
-      elevation="4"
-    >
-    <div class="d-flex align-center footer" id="footer">
-      <v-icon
-        color="white"
-      >
-        mdi-email
-      </v-icon>
-      ambition65@naver.com
+    <div class="footer">
+      <div>
+        <v-icon color="white">mdi-email</v-icon>
+      </div>
+      <div class="email">ambition65@naver.com</div>
+
+      <v-spacer></v-spacer>
+      <div class="github-wrapper">
+        <div class="github" @click="goToGithubFront">
+          <v-img
+              class="github-logo"
+              src="@/assets/github_logo.png"
+              max-width="30"
+          /> <div class="github-text">Frontend</div>
+        </div>
+        <div class="github" @click="goToGithubBack">
+          <v-img
+              class="github-logo"
+              src="@/assets/github_logo.png"
+              max-width="30"
+          /> <div class="github-text">Backend</div>
+        </div>
+      </div>
     </div>
-
-    <v-spacer></v-spacer>
-
-    <span class="github" @click="goToGithubFront">
-      <v-img
-          class="github-logo"
-          src="@/assets/github_logo.png"
-          max-width="30"
-      /> <span class="github-span">Frontend</span>
-    </span>
-    <span class="github" @click="goToGithubBack">
-      <v-img
-          class="github-logo"
-          src="@/assets/github_logo.png"
-          max-width="30"
-      /> <span class="github-span">Backend</span>
-    </span>
-    </v-app-bar>
   </v-app>
 </template>
 
@@ -114,7 +101,6 @@ export default {
   component: {
   },
   data: () => ({
-    // user: '',
     userLoading: false,
     drawer: false,
     items: [
@@ -138,6 +124,9 @@ export default {
     }
   },
   methods: {
+    goToMain() {
+      this.$router.push('/')
+    },
     goToGithubFront() {
       window.open('https://github.com/ambition98/isedol-clip-frontend')
     },
@@ -153,7 +142,6 @@ export default {
       })
     },
     async requestUser(first) {
-      console.log('requestUser')
       this.userLoading = true
       try {
         const res = await this.$axios.get('/user')
@@ -177,7 +165,6 @@ export default {
       this.userLoading = false
     },
     async refreshToken() {
-      console.log('refreshToken')
       let res = ''
       try {
         res = await this.$axios.get('/refresh')
@@ -210,29 +197,56 @@ export default {
 }
 </script>
 <style scoped>
-#isedol-logo {
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #5E35B1;
+  padding: 8px 10px;
+}
+.isedol-logo {
   margin-right: 10px;
 }
-#title {
-  font-size: 1.5rem;
+.title {
+  display: flex;
+  align-items: center;
   color: white;
-}
-#footer {
-  font-size: 1.2rem;
-  color: white;
-}
-#footer > i {
-  margin-right: 10px;
-}
-.github {
-  margin-left: 20px;
   cursor: pointer;
 }
-.github-logo {
-  margin-left: 15px;
+.title-text {
+  font-size: 1.3rem;
 }
-.github-span {
+.user-name {
   color: white;
+}
+.footer {
+  position:absolute;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  bottom:0;
+  width:100%;
+  background:#616161;
+  padding: 3px 10px;
+}
+.footer {
+  display: flex;
+  align-items: center;
+}
+.github-wrapper {
+  display: flex;
+}
+.github {
+  margin-left: 10px;
+  color: white;
+  display: inline;
+}
+.github-logo {
+  margin: auto;
+}
+.email {
+  color: white;
+  margin-left: 10px;
+  display: inline;
 }
 .user {
   display: flex;

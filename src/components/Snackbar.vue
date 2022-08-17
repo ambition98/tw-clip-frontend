@@ -1,9 +1,9 @@
 <template>
     <v-snackbar
-            timeout="2000"
-            v-model="open"
-            rounded="pill"
-            elevation="15"
+        timeout="2000"
+        v-model="open"
+        rounded="pill"
+        elevation="15"
     >
             {{ $props.text }}
     </v-snackbar>

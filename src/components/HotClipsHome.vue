@@ -9,7 +9,10 @@
                     <v-col v-for="clip in hotclips" :key="clip.id" align-self="start" md="3" class="clip-container">
                         <Clip :clip="clip" />
                     </v-col>
-                    <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
+                    <InfiniteLoading @infinite="infiniteHandler">
+                        <div slot="no-more"></div>
+                        <div slot="no-results"></div>
+                    </InfiniteLoading>
                 </v-row>
             </v-container>
         </v-item-group>
@@ -140,7 +143,7 @@ export default {
 .hotclip-top {
     border-bottom: 1px soild black;
 }
-.clip-img {
+/* .clip-img {
     margin-bottom: 5px;
     cursor: pointer;
 }
@@ -152,7 +155,7 @@ export default {
     margin-left: 10px;
     position: relative;
     bottom: 2px;
-}
+} */
 .clip-container {
     position: relative;
 }

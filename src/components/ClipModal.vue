@@ -13,14 +13,18 @@
         <v-divider></v-divider>
 
         <div class="icon-row">
+            <!-- @click="clickModalIcon(item.icon)" -->
           <div
-            @click="clickModalIcon(item.icon)"
               class="icon-container"
               v-for="item in items"
               :key="item.title"
               :style="item.style"
               >
-            <div class="icon"><v-icon color="purple lighten-1" :disabled="item.disabled" >{{ item.icon }}</v-icon></div>
+            <div class="icon">
+              <v-btn icon @click="clickModalIcon(item.icon)">
+                <v-icon color="purple lighten-1" :disabled="item.disabled" >{{ item.icon }}</v-icon>
+              </v-btn>
+            </div>
             <div class="icon-desc">{{ item.title }}</div>
           </div>
         </div>
@@ -97,8 +101,8 @@ export default {
       },
       postFavorite(first) {
         const data = { clipId: this.clip.id }
-        this.$axios.post('/user/favorite', data
-        ).then(res => {
+        this.$axios.post('/user/favorite', data)
+        .then(res => {
           console.log(res.data)
             this.snackbarText = '즐겨찾기에 추가되었습니다.'
             this.snackbar = true
@@ -186,6 +190,6 @@ export default {
 .icon-container {
   display: inline-block;
   margin: 10px;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 </style>
