@@ -44,32 +44,17 @@ export default {
     },
     methods: {
         submit() {
-            this.deleteCategory(true)
+            this.$callUserApi(this.deleteCategory)
         },
-        deleteCategory(first) {
+        deleteCategory() {
             this.$axios.delete('/user/category/' + this.category.id)
             .then(res => {
-                console.log('/user/category dto: ', res.data)
+                console.log('DELETE /user/category dto: ', res.data)
                 this.$emit('submit', this.targetCategory)
                 this.open = false
             }).catch(err => {
-                const status = err.response.status
-                if (first && status === 401) {
-                    this.refreshToken(this.deleteCategory)
-                }
+                console.log('DELETE /user/category err:', err.response)
             })
-        },
-        async refreshToken(method) {
-            try {
-                const res = await this.$axios.get('/refresh')
-                console.log(res.data)
-                method(false)
-            } catch (err) {
-                alert('다시 로그인 해 주세요')
-            }
-        },
-        setUser(user) {
-            this.$store.dispatch('setUser', user)
         }
     }
 }

@@ -1,22 +1,28 @@
-const method = {
-    async refresh(tk, afterMethod) {
-        const res = await this.$axios.get('/refresh', {
-            headers: { Authorization: 'Bearer ' + tk }
-        })
-        if (res.status === 200) {
-            this.user = res.data.dto.twitchUser
-            this.$cookies.set('tk', res.data.dto.accessToken)
-            if (afterMethod) {
-                afterMethod(false)
-            }
-        } else {
-            this.$cookies.set('tk', '')
-            alert('다시 로그인해 주세요')
-        }
-    }
-}
 export default {
     install(Vue) {
-        Vue.config.properties.$refresh = method.refresh
+        Vue.prototype.$callUserApi = global.callUserApi
+    }
+}
+
+export const global = {
+    async callUserApi(method) {
+        try {
+            const res = await this.$axios.get('/user/verify')
+            console.log('verify: ', res)
+            console.log('Execute method()')
+            method()
+        } catch (err) {
+            const status = err.response.status
+            console.log('/user/verify status:', status)
+            if (status === 401) {
+                console.log('Try refresh token')
+                const res = await this.$axios.get('/refresh')
+                console.log('/refresh:', res.data)
+                console.log('Refreshed. Try execute method()')
+                method()
+            } else {
+                alert('로그아웃 되었습니다.')
+            }
+        }
     }
 }

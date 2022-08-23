@@ -39,7 +39,8 @@
                     </v-row>
                     <v-row v-else-if="existedClip">
                         <v-col v-for="clip in clips" :key="clip.id" align-self="start" md="3" class="clip-container">
-                            <Clip :clip="clip" />
+                            <!-- <Clip :clip="clip" /> -->
+                            {{ clip }}
                         </v-col>
                     </v-row>
                     <v-row v-else>
@@ -65,7 +66,7 @@ import Snackbar from '@/components/Snackbar.vue'
 import BroadcasterSearch from '@/components/BroadcasterSearch.vue'
 import ClipModal from '@/components/ClipModal.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import Clip from '@/components/Clip.vue'
+// import Clip from '@/components/Clip.vue'
 import CreateCategoryModal from '@/components/CreateCategoryModal.vue'
 import DeleteCategoryModal from '@/components/DeleteCategoryModal.vue'
 
@@ -75,7 +76,7 @@ export default {
         BroadcasterSearch,
         ClipModal,
         ProgressCircular,
-        Clip,
+        // Clip,
         CreateCategoryModal,
         DeleteCategoryModal
     },
@@ -97,7 +98,7 @@ export default {
     },
     watch: {
         select: function() {
-            this.getCategoryClips(true)
+            this.$callUserApi(this.getCategoryClips)
         }
     },
     data() {
@@ -116,39 +117,40 @@ export default {
         }
     },
     created() {
-        this.getCategorys(true)
+        this.$callUserApi(this.getCategorys)
     },
     methods: {
-        getCategorys(first) {
-            this.$axios.get('/user/categorys')
+        getCategorys() {
+            const url = '/user/categorys'
+            this.$axios.get(url)
             .then(res => {
-                console.log('/user/categorys res.data.dto: ', res.data.dto)
-                this.categorys = res.data.dto
+                console.log('GET' + url + ':', res.data.dto)
+                if (res.data.dto) {
+                    this.categorys = res.data.dto
+                }
                 this.select = this.categorys[0]
             }).catch(err => {
-                if (first && err.response.status === 401) {
-                    this.refreshToken(this.getCategorys)
-                } else {
-                    // alert('다시 로그인해 주세요')
-                }
+                console.log('GET' + url + ':', err.response)
             })
         },
-        getCategoryClips(first) {
+        getCategoryClips() {
+            this.clips = ''
+            console.log('getCategoryClips()')
+            const url = '/user/category/' + this.select.id + '/clips'
+            this.$axios.get(url)
+            .then(res => {
+                console.log('GET ' + url + ':', res.data.dto)
+                if (res.data.dto) {
+                    this.clips = res.data.dto
+                }
+            }).catch(err => {
+                console.log('GET ' + url + ':', err.response)
+            })
             this.loading = false
         },
-        async refreshToken(method) {
-            try {
-                const res = await this.$axios.get('/refresh')
-                console.log(res.data)
-                method(false)
-            } catch (err) {
-                alert('다시 로그인 해 주세요')
-            }
-        },
-        setUser(user) {
-            this.$store.dispatch('setUser', user)
-        },
         addedCategory(category) {
+            console.log('addedCategory: ', category)
+
             this.categorys.push(category)
             this.snackbarText = '추가되었습니다'
             this.snackbar = true

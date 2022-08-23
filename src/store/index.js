@@ -1,5 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
+
+// const vuexPersist = new VuecPersistedState({
+//   plugins: [createPersistedState()]
+// })
 
 Vue.use(Vuex)
 
@@ -88,6 +93,7 @@ export default new Vuex.Store({
       commit('setUser', user)
     }
   },
-  modules: {
-  }
+  plugins: [
+    createPersistedState()
+  ]
 })

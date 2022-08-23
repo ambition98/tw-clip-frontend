@@ -77,9 +77,11 @@ export default {
                 if (res.data.dto) {
                     this.page++
                     console.log(res.data.dto)
-                    res.data.dto.forEach(clip => {
-                        this.clips.push(clip)
-                    })
+                    if (res.data.dto) {
+                        res.data.dto.forEach(clip => {
+                            this.clips.push(clip)
+                        })
+                    }
                     $state.loaded()
                 } else {
                     $state.complete()
@@ -93,21 +95,6 @@ export default {
                 }
             })
         },
-        // getFavorites(first) {
-        //     this.$axios.get('/user/favorites', {
-        //         params: { page: 0 }
-        //     })
-        //     .then(res => {
-        //         this.clips = res.data.dto
-        //         this.loadedClip = true
-        //     }).catch(err => {
-        //         if (first && err.response.status === 401) {
-        //             this.refreshToken(this.getFavorites)
-        //         } else {
-        //             //
-        //         }
-        //     })
-        // },
         async refreshToken() {
             try {
                 const res = await this.$axios.get('/refresh')

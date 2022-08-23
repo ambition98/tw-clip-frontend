@@ -31,15 +31,18 @@
       </v-card>
     </v-dialog>
     <Snackbar v-if="snackbar" :snackbar="snackbar" :text="snackbarText" @close="snackbar=false"/>
+    <AddToCategoryModal v-if="addToCategoryModal" :modal="addToCategoryModal" :clipId="$props.clip.id" @close="addToCategoryModal=false" @submit="addedClipToCategory"/>
   </div>
 </template>
 <script>
 import Snackbar from '@/components/Snackbar.vue'
+import AddToCategoryModal from '@/components/AddToCategoryModal.vue'
 
 export default {
     name: 'ClipModal',
     components: {
-      Snackbar
+      Snackbar,
+      AddToCategoryModal
     },
     props: ['modal', 'clip'],
     data() {
@@ -55,7 +58,8 @@ export default {
           open: '',
           url: '',
           embedUrl: '',
-          videoId: ''
+          videoId: '',
+          addToCategoryModal: false
         }
     },
     watch: {
@@ -68,8 +72,8 @@ export default {
     created() {
       this.open = this.modal
       this.url = this.clip.url
-      this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
-      // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&autoplay=false&muted=false'
+      // this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
+      this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&muted=false'
       if (this.clip.videoId !== '') {
           this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
       } else {
@@ -78,7 +82,7 @@ export default {
         this.items[0].style = 'cursor: auto;'
       }
 
-      this.setFavoriteIcon(true)
+      this.$callUserApi(this.setFavoriteIcon)
     },
     methods: {
       clickModalIcon(icon) {
@@ -90,36 +94,26 @@ export default {
           this.snackbarText = '복사되었습니다.'
           this.snackbar = true
         } else if (icon === 'mdi-star-outline') {
-          console.log('post')
-          this.postFavorite(true)
+          this.$callUserApi(this.postFavorite)
         } else if (icon === 'mdi-star') {
-          console.log('delete')
-          this.deleteFavorite(true)
+          this.$callUserApi(this.deleteFavorite)
         } else if (icon === 'mdi-plus-box') {
-            //
+            this.addToCategoryModal = true
         }
       },
-      postFavorite(first) {
+      postFavorite() {
         const data = { clipId: this.clip.id }
         this.$axios.post('/user/favorite', data)
         .then(res => {
-          console.log(res.data)
-            this.snackbarText = '즐겨찾기에 추가되었습니다.'
-            this.snackbar = true
-            this.items[2].icon = 'mdi-star'
+          console.log('POST /user/favorite', res.data.dto)
+          this.snackbarText = '즐겨찾기에 추가되었습니다.'
+          this.snackbar = true
+          this.items[2].icon = 'mdi-star'
         }).catch(err => {
-          const status = err.response.status
-          if (first && status === 401) {
-            this.refreshToken(this.postFavorite)
-          } else if (status === 409) {
-            this.snackbarText = '이미 즐겨찾기된 클립입니다.'
-            this.snackbar = true
-          } else {
-            alert('다시 로그인해 주세요')
-          }
+          console.log('POST /user/favorite err:', err.response)
         })
       },
-      deleteFavorite(first) {
+      deleteFavorite() {
         this.$axios.delete('/user/favorite/' + this.clip.id)
         .then(res => {
           console.log(res.data)
@@ -127,19 +121,10 @@ export default {
             this.snackbar = true
             this.items[2].icon = 'mdi-star-outline'
         }).catch(err => {
-          const status = err.response.status
-          if (first && status === 401) {
-            this.refreshToken(this.postFavorite)
-          } else if (status === 409) {
-            // alert('이미 추가된 클립입니다.')
-            this.snackbarText = '이미 즐겨찾기된 클립입니다.'
-            this.snackbar = true
-          } else {
-            alert('다시 로그인해 주세요')
-          }
+          console.log('DELETE /user/favorite err:', err.response)
         })
       },
-      setFavoriteIcon(first) {
+      setFavoriteIcon() {
         this.$axios.get('/user/favorite/exists', {
           params: {
             clipId: this.clip.id
@@ -150,23 +135,12 @@ export default {
             this.items[2].icon = 'mdi-star'
           }
         }).catch(err => {
-          const status = err.response.status
-          if (first && status === 401) {
-            this.refreshToken(this.setFavoriteIcon)
-          }
+          console.log('GET /favorite/exists err:', err.response)
         })
       },
-      async refreshToken(method) {
-        try {
-          const res = await this.$axios.get('/refresh')
-          this.setUser(res.data.dto)
-          method(false)
-        } catch (err) {
-          alert('다시 로그인해 주세요')
-        }
-      },
-      setUser(user) {
-        this.$store.dispatch('setUser', user)
+      addedClipToCategory() {
+        this.snackbarText = '추가되었습니다.'
+        this.snackbar = true
       }
     }
 }

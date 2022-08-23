@@ -65,7 +65,7 @@ export default {
             }).then(res => {
                 if (res.data.dto) {
                     this.page++
-                    console.log(res.data)
+                    console.log('/storeage/hotclips:', res.data)
                     res.data.dto.forEach(clip => {
                         this.hotclips.push(clip)
                     })

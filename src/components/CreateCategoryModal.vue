@@ -51,12 +51,9 @@ export default {
         }
       }
     },
-    setup() {},
     created() {
         this.open = this.modal
     },
-    mounted() {},
-    unmounted() {},
     methods: {
         submit() {
             let valid = true
@@ -67,42 +64,27 @@ export default {
             })
 
             if (valid) {
-                this.postCategory(true)
+                this.$callUserApi(this.postCategory)
             } else {
                 this.snackbarText = '1~20 글자 사이로 입력해주세요'
                 this.snackbar = true
             }
         },
-        async postCategory(first) {
+        async postCategory() {
+            const url = '/user/category'
             const data = { categoryName: this.value }
             try {
-                const res = await this.$axios.post('/user/category', data)
-                console.log('/user/category dto', res.data.dto)
-                this.$emit('submit', res.data.dto)
+                const res = await this.$axios.post(url, data)
+                console.log('POST ' + url + ':', res.data.dto)
+                const category = {
+                    id: res.data.dto.id,
+                    categoryName: res.data.dto.categoryName
+                }
+                this.$emit('submit', category)
                 this.open = false
             } catch (err) {
-                const status = err.response.status
-                if (status === 400) {
-                    const msg = err.response.data.msg
-                    this.snackbarText = msg
-                    this.snackbar = true
-                } else if (first && status === 401) {
-                    this.refreshToken(this.postCategory)
-                }
-                console.log('/user/category err', err.response.data)
+                console.log('POST' + url + ':', err.response)
             }
-        },
-        async refreshToken(method) {
-            try {
-                const res = await this.$axios.get('/refresh')
-                console.log(res.data)
-                method(false)
-            } catch (err) {
-                alert('다시 로그인 해 주세요')
-            }
-        },
-        setUser(user) {
-            this.$store.dispatch('setUser', user)
         }
     }
 }

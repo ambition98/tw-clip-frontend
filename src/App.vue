@@ -22,9 +22,9 @@
         <span class="user-name">{{ storeUser.displayName }}</span>
       </div>
       <div v-else>
-        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&response_type=code">
-        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&response_type=code"> -->
-          <v-btn id="test" color="purple" elevation="2">로그인</v-btn>
+        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&response_type=code"> -->
+        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&response_type=code">
+          <v-btn class="login-btn" color="purple" elevation="2">로그인</v-btn>
         </a>
       </div>
     </div>
@@ -109,10 +109,6 @@ export default {
       { title: '로그아웃', icon: 'mdi-logout' }
     ]
   }),
-  created() {
-    this.requestAndStoreIsedol()
-    this.requestUser(true)
-  },
   computed: {
     storeUser: function() {
       return this.getUser()
@@ -141,40 +137,12 @@ export default {
         this.$store.dispatch('setIsedolInfo', res.data.dto)
       })
     },
-    async requestUser(first) {
-      this.userLoading = true
-      try {
-        const res = await this.$axios.get('/user')
-        console.log('/user: ', res.data.dto)
-        this.setUser(res.data.dto)
-      } catch (err) {
-        console.log('/user err', err.response)
-        if (first && err.response.status === 401) {
-          this.refreshToken()
-        } else {
-          // alert('다시 로그인해 주세요')
-        }
-      }
-      this.userLoading = false
-    },
     async logout() {
       this.userLoading = true
       const res = await this.$axios.post('/logout')
       console.log(res)
       this.setUser('')
       this.userLoading = false
-    },
-    async refreshToken() {
-      let res = ''
-      try {
-        res = await this.$axios.get('/refresh')
-        this.setUser(res.data.dto)
-        console.log('refershed')
-        this.requestUser(false)
-      } catch (err) {
-        this.setUser('')
-        // alert('다시 로그인 해 주세요')
-      }
     },
     clickList(title) {
       if (title === '로그아웃') {
@@ -199,6 +167,7 @@ export default {
 <style scoped>
 .header {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   background-color: #5E35B1;
   padding: 8px 10px;
@@ -214,6 +183,9 @@ export default {
 }
 .title-text {
   font-size: 1.3rem;
+}
+.login-btn {
+  color: white;
 }
 .user-name {
   color: white;
