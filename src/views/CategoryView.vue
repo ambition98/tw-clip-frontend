@@ -16,12 +16,13 @@
                         v-model="select"
                         :items="categorys"
                         item-text="categoryName"
+                        readonly
                     ></v-combobox>
                         <!-- :item-text="item => item.categoryName" -->
                     <v-btn class="plus-icon" icon @click="createCategoryModal = true">
                         <v-icon color="gray">mdi-plus</v-icon>
                     </v-btn>
-                    <v-btn class="plus-icon" icon @click="deleteCategoryModal = true">
+                    <v-btn class="plus-icon" icon @click="clickDeleteCategory()">
                         <v-icon color="gray">mdi-minus</v-icon>
                     </v-btn>
                 </div>
@@ -97,6 +98,11 @@ export default {
         }
     },
     watch: {
+        categorys: function() {
+            if (this.categorys.length < 1) {
+                this.select = '카테고리 없음'
+            }
+        },
         select: function() {
             this.$callUserApi(this.getCategoryClips)
         }
@@ -109,7 +115,7 @@ export default {
             snackbarText: '',
             clips: [],
             clip: '',
-            select: '카테고리 선택',
+            select: '카테고리 없음',
             categorys: [],
             createCategoryModal: false,
             deleteCategoryModal: false,
@@ -117,7 +123,12 @@ export default {
         }
     },
     created() {
-        this.$callUserApi(this.getCategorys)
+        if (this.$store.getters.getUser) {
+            this.$callUserApi(this.getCategorys)
+        } else {
+            alert('로그인 해 주세요')
+            this.$router.push('/')
+        }
     },
     methods: {
         getCategorys() {
@@ -127,8 +138,8 @@ export default {
                 console.log('GET' + url + ':', res.data.dto)
                 if (res.data.dto) {
                     this.categorys = res.data.dto
+                    this.select = this.categorys[0]
                 }
-                this.select = this.categorys[0]
             }).catch(err => {
                 console.log('GET' + url + ':', err.response)
             })
@@ -148,12 +159,20 @@ export default {
             })
             this.loading = false
         },
+        clickDeleteCategory() {
+            if (this.select !== '카테고리 없음') {
+                this.deleteCategoryModal = true
+            }
+        },
         addedCategory(category) {
             console.log('addedCategory: ', category)
 
             this.categorys.push(category)
             this.snackbarText = '추가되었습니다'
             this.snackbar = true
+            if (this.categorys.length === 1) {
+                this.select = this.categorys[0]
+            }
         },
         deletedCategory(category) {
             this.categorys.forEach((e, idx) => {

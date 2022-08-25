@@ -50,8 +50,8 @@ export default {
           items: [
             { icon: 'mdi-video', title: '원본동영상', disabled: false, style: '' },
             { icon: 'mdi-link', title: '링크복사', disabled: false, style: '' },
-            { icon: 'mdi-star-outline', title: '즐겨찾기 추가', disabled: false, style: '' },
-            { icon: 'mdi-plus-box', title: '카테고리추가', disabled: false, style: '' }
+            { icon: 'mdi-star-outline', title: '즐겨찾기', disabled: false, style: '' },
+            { icon: 'mdi-plus-box', title: '카테고리', disabled: false, style: '' }
           ],
           snackbar: false,
           snackbarText: '',
@@ -72,8 +72,8 @@ export default {
     created() {
       this.open = this.modal
       this.url = this.clip.url
-      // this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
-      this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&muted=false'
+      this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
+      // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&muted=false'
       if (this.clip.videoId !== '') {
           this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
       } else {
@@ -82,23 +82,33 @@ export default {
         this.items[0].style = 'cursor: auto;'
       }
 
-      this.$callUserApi(this.setFavoriteIcon)
+      if (this.$store.getters.getUser) {
+        this.$callUserApi(this.setFavoriteIcon)
+      }
     },
     methods: {
       clickModalIcon(icon) {
         if (icon === 'mdi-video') {
-          console.log(this.videoUrl)
           window.open(this.videoUrl)
         } else if (icon === 'mdi-link') {
-          this.$copyText(this.url)
+          console.log('url', this.url)
+          navigator.clipboard.writeText(this.url)
           this.snackbarText = '복사되었습니다.'
           this.snackbar = true
         } else if (icon === 'mdi-star-outline') {
           this.$callUserApi(this.postFavorite)
         } else if (icon === 'mdi-star') {
-          this.$callUserApi(this.deleteFavorite)
+          if (this.$store.getters.getUser) {
+            this.$callUserApi(this.deleteFavorite)
+          } else {
+            alert('로그인 해 주세요')
+          }
         } else if (icon === 'mdi-plus-box') {
+          if (this.$store.getters.getUser) {
             this.addToCategoryModal = true
+          } else {
+            alert('로그인 해 주세요')
+          }
         }
       },
       postFavorite() {

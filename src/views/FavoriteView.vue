@@ -66,7 +66,12 @@ export default {
         }
     },
     created() {
-        this.infiniteHandler()
+        if (this.$store.getters.getUser) {
+            this.infiniteHandler()
+        } else {
+            alert('로그인 해 주세요')
+            this.$router.push('/')
+        }
     },
     methods: {
         infiniteHandler($state) {
@@ -87,27 +92,29 @@ export default {
                     $state.complete()
                 }
             }).catch(err => {
-                console.log('/user/favorites err', err)
+                console.log('GET /user/favorites err', err)
                 this.loading = false
                 const status = err.response.status
                 if (status === 401) {
-                    this.refreshToken()
+                    this.refreshToken($state)
                 }
             })
         },
-        async refreshToken() {
+        async refreshToken($state) {
             try {
                 const res = await this.$axios.get('/refresh')
-            console.log(res.data)
-            //   method(false)
-                this.infiniteHandler()
+                console.log('GET /refresh:', res)
+                if (res.status !== 200) {
+                    this.$logout()
+                    $state.complete()
+                } else {
+                    this.infiniteHandler()
+                }
             } catch (err) {
-                alert('다시 로그인 해 주세요')
+                this.$logout()
+                $state.complete()
             }
                 console.log('refershed')
-      },
-      setUser(user) {
-        this.$store.dispatch('setUser', user)
       }
     }
 }

@@ -13,7 +13,7 @@
                 </div>
                 <div class="btn-wrapper">
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" class="submit" @click="submit">확인</v-btn>
+                    <v-btn color="purple" class="submit" @click="submit">확인</v-btn>
                     <v-btn color="red" class="cancel" @click="open = false">취소</v-btn>
                 </div>
             </v-card>
@@ -76,6 +76,7 @@ export default {
 }
 .submit {
     margin: 10px;
+    color: white;
 }
 .cancel {
     margin-right: 10px;

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="modal">
         <v-dialog v-model="open" max-width="400px">
             <v-card>
                 <div v-if="!existsCategory">
@@ -8,15 +8,17 @@
                 <v-virtual-scroll
                     v-else
                     height="300"
-                    item-height="64"
                     :items="categorys"
+                    item-height="64"
                 >
                     <template v-slot:default="{ item }">
-                        <v-list-item :key="item.id" @mouseover="hover(item.id)" @click="click(item.id)" :id="item.id" class="category-list">
+                        {{ item.categoryName }}
+                        <!-- <v-list-item :key="item.id" @mouseover="hover(item.id)" @mouseleave="leave(item.id)" @click="click(item.id)" :id="item.id" class="category-list">
                             <v-list-item-content>
                                 {{ item.categoryName }}
                             </v-list-item-content>
-                        </v-list-item>
+                        </v-list-item> -->
+                        <v-divider></v-divider>
                     </template>
                 </v-virtual-scroll>
                 <div @click="createCategoryModal=true" class="add-category">
@@ -117,8 +119,11 @@ export default {
             console.log('selectCategory(0)')
         },
         hover(id) {
-            this.removeClass('hover')
+            // this.removeClass('hover')
             document.getElementById(id).classList.add('hover')
+        },
+        leave(id) {
+            document.getElementById(id).classList.remove('hover')
         },
         click(id) {
             this.removeClass('click')
@@ -156,6 +161,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    margin: 10px;
     color: gray;
     font-size: 0.9rem;
     cursor: pointer;

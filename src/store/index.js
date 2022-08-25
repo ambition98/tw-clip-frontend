@@ -12,8 +12,7 @@ export default new Vuex.Store({
   state: {
     isedolInfo: [],
     hotclipLoadedCnt: 0,
-    user: '',
-    login: false
+    user: ''
   },
   getters: {
     getIsedolInfo(state) {
@@ -39,9 +38,6 @@ export default new Vuex.Store({
     },
     getUser(state) {
       return state.user
-    },
-    getLogin(state) {
-      return state.login
     }
   },
   mutations: {

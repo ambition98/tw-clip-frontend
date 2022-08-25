@@ -1,6 +1,7 @@
 export default {
     install(Vue) {
         Vue.prototype.$callUserApi = global.callUserApi
+        Vue.prototype.$logout = global.logout
     }
 }
 
@@ -16,13 +17,33 @@ export const global = {
             console.log('/user/verify status:', status)
             if (status === 401) {
                 console.log('Try refresh token')
-                const res = await this.$axios.get('/refresh')
-                console.log('/refresh:', res.data)
-                console.log('Refreshed. Try execute method()')
-                method()
+                try {
+                    const refreshRes = await this.$axios.get('/refresh')
+                    if (refreshRes.status !== 200) {
+                        const res = await this.$axios.post('/logout')
+                        console.log('POST /logout', res.data)
+                        this.$store.dispatch('setUser', '')
+                        alert('로그인 해 주세요.')
+                    } else {
+                        console.log('/refresh:', refreshRes)
+                        console.log('Refreshed. Try execute method()')
+                        method()
+                    }
+                } catch (refreshErr) {
+                    console.log('refreshError:', refreshErr)
+                }
             } else {
-                alert('로그아웃 되었습니다.')
+                const res = await this.$axios.post('/logout')
+                console.log('POST /logout', res.data)
+                this.$store.dispatch('setUser', '')
+                alert('로그인 해 주세요.')
             }
         }
+    },
+    async logout() {
+        const res = await this.$axios.post('/logout')
+        console.log('POST /logout', res.data)
+        this.$store.dispatch('setUser', '')
+        alert('로그아웃 되었습니다.')
     }
 }
