@@ -3,6 +3,7 @@
         <v-dialog v-model="open" max-width="500px">
             <v-card>
                 <div class="description">
+                    <div class="title">카테고리 삭제</div>
                     <div class="category-name">
                         "{{ category.categoryName }}"
                     </div>
@@ -80,5 +81,10 @@ export default {
 }
 .cancel {
     margin-right: 10px;
+}
+.title {
+    margin-bottom: 20px;
+    color: purple;
+    font-weight: bold;
 }
 </style>

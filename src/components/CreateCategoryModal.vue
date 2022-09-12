@@ -3,6 +3,7 @@
         <v-dialog v-model="open" max-width="500px">
             <v-card>
                 <div class="input-wrapper">
+                    <div class="title">카테고리 추가</div>
                     <v-text-field
                         color="purple"
                         v-model="value"
@@ -11,6 +12,8 @@
                         hide-details="auto"
                         ref="input"
                         autofocus
+                        :error="err"
+                        :error-messages="errMsg"
                     ></v-text-field>
                 </div>
                 <div class="btn-wrapper">
@@ -37,12 +40,14 @@ export default {
             value: '',
             rules: [
                 value => !!value || '필수항목입니다.',
-                value => (value && value.length <= 20) || '20자를 넘을 수 없습니다.'
+                value => (value && value.length <= 20) || '1~20 글자 사이로 입력해주세요'
             ],
             open: '',
             snackbar: false,
             snackbarText: '',
-            addedCategory: ''
+            addedCategory: '',
+            err: false,
+            errMsg: ''
         }
     },
     watch: {
@@ -50,6 +55,10 @@ export default {
         if (!this.open) {
           this.$emit('close')
         }
+      },
+      value: function() {
+        this.err = false
+        this.errMsg = ''
       }
     },
     created() {
@@ -57,19 +66,7 @@ export default {
     },
     methods: {
         submit() {
-            let valid = true
-            this.rules.forEach(e => {
-                if (!(e(this.value) === true)) {
-                    valid = false
-                }
-            })
-
-            if (valid) {
-                this.$callUserApi(this.postCategory)
-            } else {
-                this.snackbarText = '1~20 글자 사이로 입력해주세요'
-                this.snackbar = true
-            }
+            this.$callUserApi(this.postCategory)
         },
         async postCategory() {
             const url = '/user/category'
@@ -81,10 +78,14 @@ export default {
                     id: res.data.dto.id,
                     categoryName: res.data.dto.categoryName
                 }
+                this.errMsg = ''
+                this.err = false
                 this.$emit('submit', category)
                 this.open = false
             } catch (err) {
-                console.log('POST' + url + ':', err.response)
+                console.log('POST' + url + ':', err.response.data)
+                this.errMsg = err.response.data.msg
+                this.err = true
             }
         }
     }
@@ -104,5 +105,10 @@ export default {
 }
 .cancel {
     margin-right: 10px;
+}
+.title {
+    margin-bottom: 20px;
+    color: purple;
+    font-weight: bold;
 }
 </style>

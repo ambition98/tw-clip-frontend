@@ -23,7 +23,7 @@ export const global = {
                         const res = await this.$axios.post('/logout')
                         console.log('POST /logout', res.data)
                         this.$store.dispatch('setUser', '')
-                        alert('로그인 해 주세요.')
+                        alert('로그아웃 되었습니다.')
                     } else {
                         console.log('/refresh:', refreshRes)
                         console.log('Refreshed. Try execute method()')
@@ -36,7 +36,7 @@ export const global = {
                 const res = await this.$axios.post('/logout')
                 console.log('POST /logout', res.data)
                 this.$store.dispatch('setUser', '')
-                alert('로그인 해 주세요.')
+                alert('로그아웃 되었습니다.')
             }
         }
     },

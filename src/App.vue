@@ -64,9 +64,11 @@
       </v-list>
     </v-navigation-drawer>
 
+    <div class="main">
     <v-main>
       <router-view :key="$route.fullPath"/>
     </v-main>
+    </div>
     <div class="footer">
       <div>
         <v-icon color="white">mdi-email</v-icon>
@@ -98,7 +100,10 @@
 
 export default {
   name: 'App',
-  component: {
+  created() {
+    if (this.getUser()) {
+      this.$callUserApi(this.checkJwtValid)
+    }
   },
   data: () => ({
     userLoading: false,
@@ -137,16 +142,18 @@ export default {
         this.$store.dispatch('setIsedolInfo', res.data.dto)
       })
     },
-    async logout() {
-      this.userLoading = true
-      const res = await this.$axios.post('/logout')
-      console.log(res)
-      this.setUser('')
-      this.userLoading = false
+    checkJwtValid() {
+      this.$axios.get('/user/verify')
+      .then(res => {
+        console.log('GET /user/verify: ', res.data)
+      }).catch(err => {
+        console.log('GET /user/verify err: ', err.response)
+      })
     },
     clickList(title) {
       if (title === '로그아웃') {
-        this.logout()
+        // this.logout()
+        this.$logout()
         this.setUser('')
         this.$router.go()
       } else if (title === '내 카테고리') {
@@ -190,15 +197,17 @@ export default {
 .user-name {
   color: white;
 }
+.main {
+  margin-bottom: 50px;
+}
 .footer {
   position:absolute;
-  display: flex;
-  align-items: center;
   flex-wrap: wrap;
   bottom:0;
   width:100%;
   background:#616161;
   padding: 3px 10px;
+  margin-top: 10px;
 }
 .footer {
   display: flex;

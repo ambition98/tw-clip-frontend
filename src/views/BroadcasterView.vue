@@ -86,7 +86,7 @@ export default {
     },
     watch: {
         tab: function() {
-            for (var i = 0; i < this.tab.length; i++) {
+            for (let i = 0; i < this.tab.length; i++) {
                 this.tabLoaded[i] = false
             }
             this.endedAt = this.getYMD(new Date())

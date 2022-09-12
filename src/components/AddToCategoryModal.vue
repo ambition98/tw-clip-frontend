@@ -9,15 +9,21 @@
                     v-else
                     height="300"
                     :items="categorys"
-                    item-height="64"
+                    item-height="49"
                 >
                     <template v-slot:default="{ item }">
-                        {{ item.categoryName }}
-                        <!-- <v-list-item :key="item.id" @mouseover="hover(item.id)" @mouseleave="leave(item.id)" @click="click(item.id)" :id="item.id" class="category-list">
+                        <v-list-item
+                            :key="item.id"
+                            @mouseover="hover(item.id)"
+                            @mouseleave="leave(item.id)"
+                            @click="click(item.id)"
+                            :id="item.id"
+                            class="category-list"
+                        >
                             <v-list-item-content>
                                 {{ item.categoryName }}
                             </v-list-item-content>
-                        </v-list-item> -->
+                        </v-list-item>
                         <v-divider></v-divider>
                     </template>
                 </v-virtual-scroll>
@@ -132,7 +138,7 @@ export default {
         },
         removeClass(c) {
             const list = document.getElementsByClassName('category-list')
-            for (var i = 0; i < list.length; i++) {
+            for (let i = 0; i < list.length; i++) {
                 list[i].classList.remove(c)
             }
         }

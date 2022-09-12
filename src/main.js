@@ -4,7 +4,6 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import VueCookies from 'vue-cookies'
-// import VueClipboard from 'vue-clipboard2'
 import ProfileMenu from '@/components/ProfileMenu.vue'
 import globalMethod from './globalMethod.js'
 
