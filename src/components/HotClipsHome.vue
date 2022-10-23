@@ -35,7 +35,7 @@ export default {
     data() {
         return {
             first: 4,
-            periodArr: ['week', 'month', 'quarter'],
+            periodArr: ['day', 'week', 'month'],
             message: '',
             modal: false,
             snackbar: false,
@@ -143,19 +143,6 @@ export default {
 .hotclip-top {
     border-bottom: 1px soild black;
 }
-/* .clip-img {
-    margin-bottom: 5px;
-    cursor: pointer;
-}
-.hotclip-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-.hotclip-more {
-    margin-left: 10px;
-    position: relative;
-    bottom: 2px;
-} */
 .clip-container {
     position: relative;
 }

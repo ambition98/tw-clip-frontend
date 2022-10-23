@@ -5,14 +5,14 @@
             <div class="title-wrapper">
                 <div class="title">
                     <div class="title-icon"><v-icon color="purple">mdi-view-dashboard</v-icon></div>
-                    <div>내 카테고리</div>
+                    <div>내 카테고리</div><div class="edit" @click="goToEditCat">편집</div>
                 </div>
                 <v-spacer></v-spacer>
                 <div class="select_wrapper">
                     <v-btn class="plus-icon" icon @click="createCategoryModal = true">
                         <v-icon color="gray">mdi-plus</v-icon>
                     </v-btn>
-                    <v-btn class="plus-icon" icon @click="clickDeleteCategory()">
+                    <v-btn class="plus-icon" icon @click="clickDeleteCategory">
                         <v-icon color="gray">mdi-minus</v-icon>
                     </v-btn>
                     <v-select
@@ -26,13 +26,12 @@
                         item-text="categoryName"
                         no-data-text="카테고리를 추가해주세요"
                     ></v-select>
-                        <!-- :item-text="item => item.categoryName" -->
                 </div>
             </div>
 
             <div class="search-wrapper">
                 <div class="search">
-                    <v-text-field label="검색" v-model="searchValue" color="purple"></v-text-field>
+                    <v-text-field label="클립제목, 스트리머 검색" v-model="searchValue" color="purple"></v-text-field>
                 </div>
 
                 <v-spacer></v-spacer>
@@ -67,12 +66,14 @@
             </v-item-group>
             <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="modal=false"/>
             <CreateCategoryModal v-if="createCategoryModal" :modal="createCategoryModal" @close="createCategoryModal=false" @submit="addedCategory"/>
-            <DeleteCategoryModal
-                v-if="deleteCategoryModal"
-                :modal="deleteCategoryModal"
-                :category="selectedCategory"
-                @close="deleteCategoryModal=false"
-                @submit="deletedCategory"
+            <ConfirmModal
+                v-if="confirmModal"
+                :modal="confirmModal"
+                :title="confirmTitle"
+                :content="confirmContent"
+                :info="confirmInfo"
+                @close="confirmModal=false"
+                @submit="deleteCat"
             />
             <Snackbar v-if="snackbar" :snackbar="snackbar" :text="snackbarText" @close="snackbar=false"/>
         </v-container>
@@ -85,7 +86,7 @@ import ClipModal from '@/components/ClipModal.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import Clip from '@/components/Clip.vue'
 import CreateCategoryModal from '@/components/CreateCategoryModal.vue'
-import DeleteCategoryModal from '@/components/DeleteCategoryModal.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 export default {
     components: {
@@ -95,7 +96,7 @@ export default {
         ProgressCircular,
         Clip,
         CreateCategoryModal,
-        DeleteCategoryModal
+        ConfirmModal
     },
     computed: {
         existedCategory: function() {
@@ -120,6 +121,9 @@ export default {
             }
         },
         selectedCategory: function() {
+            this.loading = true
+            this.clips = []
+            this.allClips = []
             this.$callUserApi(this.getCategoryClips)
         },
         selectedSort: function() {
@@ -146,20 +150,23 @@ export default {
             clips: [],
             allClips: [],
             clip: '',
-            selectedCategory: '카테고리 없음',
+            selectedCategory: '',
             categorys: [],
             createCategoryModal: false,
-            deleteCategoryModal: false,
+            confirmModal: false,
+            confirmTitle: '',
+            confirmContent: '',
+            confirmInfo: '',
             loading: true,
             searchValue: '',
-            selectedSort: '클립생성날짜▼',
+            selectedSort: '',
             sort: [
+                '추가날짜▲',
+                '추가날짜▼',
                 '클립생성날짜▲',
                 '클립생성날짜▼',
                 '조회수▲',
                 '조회수▼',
-                '추가날짜▲',
-                '추가날짜▼',
                 '이름▲',
                 '이름▼'
             ]
@@ -172,6 +179,7 @@ export default {
             alert('로그인 해 주세요')
             this.$router.push('/')
         }
+        this.loading = false
     },
     methods: {
         getCategorys() {
@@ -184,6 +192,7 @@ export default {
                         this.categorys.push(e)
                     })
                     this.selectedCategory = this.categorys[0]
+                    this.selectedSort = '추가날짜▼'
                 }
             }).catch(err => {
                 console.log('GET ' + url + ':', err.response)
@@ -191,7 +200,6 @@ export default {
         },
         getCategoryClips() {
             this.clips = ''
-            console.log('getCategoryClips()')
             const url = '/user/category/' + this.selectedCategory.id + '/clips'
             this.$axios.get(url)
             .then(res => {
@@ -199,18 +207,20 @@ export default {
                 if (res.data.dto) {
                     res.data.dto.forEach(clip => {
                         this.allClips.push(clip)
-                        // this.clips.push(clip)
                     })
                     this.clips = this.allClips
                 }
+                this.loading = false
             }).catch(err => {
                 console.log('GET ' + url + ':', err.response)
             })
-            this.loading = false
         },
         clickDeleteCategory() {
             if (this.selectedCategory !== '카테고리 없음') {
-                this.deleteCategoryModal = true
+                this.confirmTitle = '카테고리 삭제'
+                this.confirmContent = '카테고리를 정말 삭제하시겠습니까? 저장된 클립은 복구할 수 없습니다.'
+                this.confirmInfo = this.selectedCategory.categoryName
+                this.confirmModal = true
             }
         },
         addedCategory(category) {
@@ -223,13 +233,23 @@ export default {
                 this.selectedCategory = this.categorys[0]
             }
         },
-        deletedCategory(category) {
+        deleteCat() {
+            this.$callUserApi(this.deleteCategory)
+
             this.categorys.forEach((e, idx) => {
-                if (e.id === category.id) {
+                if (e.id === this.selectedCategory.id) {
                     this.categorys.splice(idx, 1)
                 }
             })
             this.selectedCategory = this.categorys.length > 0 ? this.categorys[0] : ''
+        },
+        deleteCategory() {
+            this.$axios.delete('/user/category/' + this.selectedCategory.id)
+            .then(res => {
+                console.log('DELETE /user/category dto: ', res.data)
+            }).catch(err => {
+                console.log('DELETE /user/category err:', err.response)
+            })
         },
         sortClips() {
             if (this.selectedSort === '조회수▲') {
@@ -265,6 +285,9 @@ export default {
                     return b.title < a.title ? -1 : 1
                 })
             }
+        },
+        goToEditCat() {
+            this.$router.push('/editcat')
         }
     }
 }
@@ -319,5 +342,12 @@ export default {
 .search {
     position: relative;
     bottom: 7px;
+    min-width: 200px;
+}
+.edit {
+    font-size: 0.9rem;
+    margin-left: 5px;
+    font-weight: 200;
+    cursor: pointer;
 }
 </style>

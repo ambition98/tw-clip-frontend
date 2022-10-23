@@ -3,14 +3,13 @@
         <v-dialog v-model="open" max-width="500px">
             <v-card>
                 <div class="description">
-                    <div class="title">카테고리 삭제</div>
-                    <div class="category-name">
-                        "{{ category.categoryName }}"
+                    <div class="title">{{ title }}</div>
+                    <div class="additional-info">
+                        {{ info }}
                     </div>
                     <div class="others">
-                        카테고리를 정말 삭제하시겠습니까?
+                        {{ content }}
                     </div>
-                    <div>저장된 클립 목록은 복구할 수 없습니다.</div>
                 </div>
                 <div class="btn-wrapper">
                     <v-spacer></v-spacer>
@@ -24,8 +23,8 @@
 <script>
 
 export default {
-    name: 'DeleteCategoryModal',
-    props: ['modal', 'category'],
+    name: 'ConfirmModal',
+    props: ['modal', 'title', 'content', 'info'],
     data() {
         return {
             open: '',
@@ -41,22 +40,23 @@ export default {
     },
     created() {
         this.open = this.modal
-        this.targetCategory = this.category
     },
     methods: {
         submit() {
             this.$callUserApi(this.deleteCategory)
-        },
-        deleteCategory() {
-            this.$axios.delete('/user/category/' + this.category.id)
-            .then(res => {
-                console.log('DELETE /user/category dto: ', res.data)
-                this.$emit('submit', this.targetCategory)
-                this.open = false
-            }).catch(err => {
-                console.log('DELETE /user/category err:', err.response)
-            })
+            this.$emit('submit')
+            this.open = false
         }
+        // deleteCategory() {
+        //     this.$axios.delete('/user/category/' + this.category.id)
+        //     .then(res => {
+        //         console.log('DELETE /user/category dto: ', res.data)
+        //         this.$emit('submit', this.targetCategory)
+        //         this.open = false
+        //     }).catch(err => {
+        //         console.log('DELETE /user/category err:', err.response)
+        //     })
+        // }
     }
 }
 </script>
@@ -64,7 +64,7 @@ export default {
 .description {
     padding: 10px;
 }
-.category-name {
+.additional-info {
     display: inline;
     font-weight: bold;
 }

@@ -1,5 +1,5 @@
 <template>
-    <v-container class="search-container">
+    <div class="search-container">
         <v-row justify="center" align="center">
             <v-col sm="5">
             <!-- <v-row align="center"> -->
@@ -15,7 +15,7 @@
             <!-- </v-row> -->
             </v-col>
         </v-row>
-    </v-container>
+    </div>
 </template>
 <script>
 export default {

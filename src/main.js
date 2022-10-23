@@ -9,8 +9,8 @@ import globalMethod from './globalMethod.js'
 
 const axios = require('axios')
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = 'http://localhost/api'
-// axios.defaults.baseURL = 'https://danyleee.com/api'
+// axios.defaults.baseURL = 'http://localhost/api'
+axios.defaults.baseURL = 'https://danyleee.com/api'
 
 Vue.use(globalMethod)
 Vue.prototype.$axios = axios

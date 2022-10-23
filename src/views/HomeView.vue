@@ -35,9 +35,9 @@ export default {
   data() {
     return {
       items: [
+        { period: 'day', title: '일간 핫클립' },
         { period: 'week', title: '주간 핫클립' },
-        { period: 'month', title: '월간 핫클립' },
-        { period: 'quarter', title: '분기별 핫클립' }
+        { period: 'month', title: '월간 핫클립' }
       ],
       tab: 0
     }

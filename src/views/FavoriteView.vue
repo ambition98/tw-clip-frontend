@@ -6,7 +6,7 @@
             <div class="title-wrapper">
                 <div class="title">
                     <div class="title-icon"><v-icon color="purple">mdi-star</v-icon></div>
-                    <div>즐겨찾기한 클립</div>
+                    <div>즐겨찾기한 클립</div><div class="edit" @click="goToEditFav">편집</div>
                 </div>
             </div>
 
@@ -94,14 +94,14 @@ export default {
             loading: true,
             clip: '',
             searchValue: '',
-            selectedSort: '클립생성날짜▼',
+            selectedSort: '',
             sort: [
+                '추가날짜▲',
+                '추가날짜▼',
                 '클립생성날짜▲',
                 '클립생성날짜▼',
                 '조회수▲',
                 '조회수▼',
-                '추가날짜▲',
-                '추가날짜▼',
                 '이름▲',
                 '이름▼'
             ],
@@ -133,7 +133,7 @@ export default {
     },
     methods: {
         getFavorites() {
-            this.$axios.get('/user/favorites')
+            this.$axios.get('/user/favorite/all')
             .then(res => {
                 this.loading = false
                 if (res.data.dto) {
@@ -145,8 +145,9 @@ export default {
                         this.clips = this.allClips
                     }
                 }
+                this.selectedSort = '추가날짜▼'
             }).catch(err => {
-                console.log('GET /user/favorites err', err.response.data)
+                console.log('GET /user/favorite err', err.response.data)
                 this.loading = false
             })
         },
@@ -156,8 +157,7 @@ export default {
             })
         },
         postFavorite(id) {
-            const data = { clipId: id }
-            this.$axios.post('/user/favorite', data)
+            this.$axios.post('/user/favorite/' + id)
             .then(res => {
                 console.log('POST /user/favorite', res.data.dto)
             }).catch(err => {
@@ -198,6 +198,9 @@ export default {
                     return b.title < a.title ? -1 : 1
                 })
             }
+        },
+        goToEditFav() {
+            this.$router.push('/editfav')
         }
     }
 }
@@ -228,6 +231,12 @@ export default {
     display: flex;
     align-items: center;
     margin-right: 5px;
+}
+.edit {
+    font-size: 0.9rem;
+    margin-left: 5px;
+    font-weight: 200;
+    cursor: pointer;
 }
 .search-wrapper {
     display: flex;

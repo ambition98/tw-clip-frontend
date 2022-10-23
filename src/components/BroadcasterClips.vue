@@ -7,7 +7,7 @@
                 </v-row>
                 <v-row v-else-if="existedClip">
                     <v-col v-for="clip in clips" :key="clip.id" align-self="start" md="3" class="clip-container">
-                        <Clip :clip="clip" />
+                        <Clip :clip="clip"/>
                     </v-col>
                     <InfiniteLoading @infinite="infiniteHandler"></InfiniteLoading>
                 </v-row>
@@ -48,8 +48,8 @@ export default {
     },
     created() {
         console.log(this.id)
-        console.log(this.startedAt)
-        console.log(this.endedAt)
+        console.log('startedAt', this.startedAt)
+        console.log('endedAt', this.endedAt)
         this.infiniteHandler()
     },
     computed: {

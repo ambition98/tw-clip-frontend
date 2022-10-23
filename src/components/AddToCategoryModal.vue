@@ -1,7 +1,7 @@
 <template>
     <div class="modal">
         <v-dialog v-model="open" max-width="400px">
-            <v-card>
+            <v-card style="padding: 10px">
                 <div v-if="!existsCategory">
                     생성된 카테고리가 없습니다.
                 </div>
@@ -151,11 +151,8 @@ export default {
     align-items: center;
 }
 .submit {
-    margin: 10px;
-    color: white;
-}
-.cancel {
     margin-right: 10px;
+    color: white;
 }
 .hover {
     background: #E1BEE7;

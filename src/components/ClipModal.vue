@@ -72,8 +72,8 @@ export default {
     created() {
       this.open = this.modal
       this.url = this.clip.url
-      this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
-      // this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&muted=false'
+      // this.embedUrl = this.clip.embedUrl + '&parent=localhost&muted=false'
+      this.embedUrl = this.clip.embedUrl + '&parent=isedol-clip.xyz&muted=false'
       if (this.clip.videoId !== '') {
           this.videoUrl = 'https://www.twitch.tv/videos/' + this.clip.videoId + '?t=' + this.clip.vodOffset + 's'
       } else {
@@ -112,8 +112,7 @@ export default {
         }
       },
       postFavorite() {
-        const data = { clipId: this.clip.id }
-        this.$axios.post('/user/favorite', data)
+        this.$axios.post('/user/favorite/' + this.clip.id)
         .then(res => {
           console.log('POST /user/favorite', res.data.dto)
           this.snackbarText = '즐겨찾기에 추가되었습니다.'

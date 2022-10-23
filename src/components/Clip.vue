@@ -4,13 +4,13 @@
             <v-card :elevation="hover ? 16 : 2">
                 <div class="duration clip-info rounded-lg">{{ getDuration(clip) }}</div>
                 <v-img eager :src="clip.thumbnailUrl" @click="openModal(clip)" class="clip-img" />
-                <div class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</div>
                 <div class="created-at clip-info rounded-lg">{{ getCreatedAt(clip) }}</div>
+                <div class="view-count clip-info rounded-lg">{{ getViewCount(clip) }}</div>
             </v-card>
         </v-hover>
         <div class="b-name" @click="goToBroadcasterPage(clip.broadcasterId)">{{ clip.broadcasterName }}</div>
         <div class="clip-title">{{ getTitle(clip) }}</div>
-        <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="closeModal" key="0"/>
+        <ClipModal v-if="modal" :modal="modal" :clip="clip" @close="closeModal" :key="key"/>
     </div>
 </template>
 <script>
@@ -24,7 +24,8 @@ export default {
     props: ['clip'],
     data() {
         return {
-            modal: false
+            modal: false,
+            key: 1
         }
     },
     methods: {
@@ -116,7 +117,7 @@ export default {
     background: rgba(0, 0, 0, 0.6);
     color: white;
     z-index: 1;
-    padding: 2px 6px;
+    padding: 1px 3px;
 }
 .duration {
     top: 10px;
@@ -127,7 +128,7 @@ export default {
     left: 10px;
 }
 .created-at {
-    bottom: 10px;
+    top: 10px;
     right: 10px;
 }
 .b-name {
@@ -142,5 +143,28 @@ export default {
 .clip-title {
     display: inline;
     overflow: hidden;
+}
+@media all and (min-width: 960px) and (max-width: 1263px) {
+    .b-name {
+        font-size: 1rem;
+    }
+    .clip-title {
+        font-size: 0.9rem;
+    }
+    .clip-info {
+        font-size: 0.9rem;
+    }
+    .duration {
+        top: 5px;
+        left: 5px;
+    }
+    .view-count {
+        bottom: 5px;
+        left: 5px;
+    }
+    .created-at {
+        top: 5px;
+        right: 5px;
+    }
 }
 </style>

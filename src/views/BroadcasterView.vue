@@ -70,7 +70,7 @@ export default {
     },
     data() {
         return {
-            tabName: ['일주전', '한달전', '세달전', '기간검색'],
+            tabName: ['하루전', '일주전', '한달전', '기간검색'],
             tab: 0,
             tabLoaded: [true, false, false, false],
             user: '',
@@ -92,15 +92,15 @@ export default {
             this.endedAt = this.getYMD(new Date())
             switch (this.tab) {
                 case 0:
-                    this.startedAt = this.getWeekAgo()
+                    this.startedAt = this.getDayAgo()
                     this.tabLoaded[0] = true
                     break
                 case 1:
-                    this.startedAt = this.getMonthAgo()
+                    this.startedAt = this.getWeekAgo()
                     this.tabLoaded[1] = true
                     break
                 case 2:
-                    this.startedAt = this.getQuarterAgo()
+                    this.startedAt = this.getMonthAgo()
                     this.tabLoaded[2] = true
                     break
                 default:
@@ -109,7 +109,7 @@ export default {
         }
     },
     created() {
-        this.startedAt = this.getWeekAgo()
+        this.startedAt = this.getDayAgo()
         this.endedAt = this.getYMD(new Date())
         this.$axios.get('/twitch/users', {
             params: {
@@ -140,6 +140,11 @@ export default {
         openEnded() {
             this.openEndedPicker = true
         },
+        getDayAgo() {
+            const now = new Date()
+            now.setDate(now.getDate() - 1)
+            return this.getYMD(now)
+        },
         getWeekAgo() {
             const now = new Date()
             now.setDate(now.getDate() - 7)
@@ -148,11 +153,6 @@ export default {
         getMonthAgo() {
             const now = new Date()
             now.setMonth(now.getMonth() - 1)
-            return this.getYMD(now)
-        },
-        getQuarterAgo() {
-            const now = new Date()
-            now.setMonth(now.getMonth() - 3)
             return this.getYMD(now)
         },
         getYMD(d) {

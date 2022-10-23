@@ -22,8 +22,8 @@
         <span class="user-name">{{ storeUser.displayName }}</span>
       </div>
       <div v-else>
-        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&response_type=code">
-        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&response_type=code"> -->
+        <!-- <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=http://localhost:8080/afterlogin&response_type=code"> -->
+        <a href="https://id.twitch.tv/oauth2/authorize?client_id=riz806ynb687m6a7piyz3jyl4q4p3a&redirect_uri=https://isedol-clip.xyz/afterlogin&response_type=code">
           <v-btn class="login-btn" color="purple" elevation="2">로그인</v-btn>
         </a>
       </div>
@@ -70,10 +70,7 @@
     </v-main>
     </div>
     <div class="footer">
-      <div>
-        <v-icon color="white">mdi-email</v-icon>
-      </div>
-      <div class="email">ambition65@naver.com</div>
+      <div class="email"><v-icon color="white">mdi-email</v-icon> ambition65@naver.com <span> - 버그제보, 기능개선 및 기능추가건의, 특정클립 노출금지 요청</span></div>
 
       <v-spacer></v-spacer>
       <div class="github-wrapper">
@@ -126,7 +123,13 @@ export default {
   },
   methods: {
     goToMain() {
-      this.$router.push('/')
+      console.log(document.URL)
+      console.log(window.location.href)
+      if (document.URL === 'http://localhost:8080/' || document.URL === 'https://isedol-clip.xyz/') {
+        this.$router.go()
+      } else {
+        this.$router.push('/')
+      }
     },
     goToGithubFront() {
       window.open('https://github.com/ambition98/isedol-clip-frontend')
@@ -208,8 +211,6 @@ export default {
   background:#616161;
   padding: 3px 10px;
   margin-top: 10px;
-}
-.footer {
   display: flex;
   align-items: center;
 }
@@ -244,5 +245,8 @@ export default {
 <style>
 a {
   text-decoration: none;
+}
+.container {
+  margin-bottom: 150px;
 }
 </style>
